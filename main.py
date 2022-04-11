@@ -41,3 +41,8 @@ async def authenticated_route(user: UserDB = Depends(current_active_user)):
 async def on_startup():
     # Not needed if you setup a migration system like Alembic
     await create_db_and_tables()
+
+@app.get("/url-list")
+def get_all_urls():
+    url_list = [{"path": route.path, "name": route.name} for route in app.routes]
+    return url_list
