@@ -26,10 +26,10 @@ def update_image(image_id: uuid.UUID, image_param: ImageBase):
     pass
 
 
-@images_router.get("/{image_id}")
-async def read_image(image_id: str, status_code=status.HTTP_200_OK) -> ImageBase:
+@images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
+async def read_image(image_id: str) -> ImageBase:
     image = await get_entity(image_id, Image)
-    return image
+    return ImageBase(**image.dict())
 
 
 @images_router.get("/")
