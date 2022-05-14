@@ -1,12 +1,13 @@
 import datetime
 
-from sqlmodel import SQLModel, Field, Boolean, DateTime
+from pydantic import AnyUrl, Json
+from sqlmodel import SQLModel, Field
 
 
 class ShowBase(SQLModel):
     title: str
-    podcast_link: str
-    media_link: str
+    podcast_link: AnyUrl
+    media_link: AnyUrl
     description: str
     generator: str
     language: str
