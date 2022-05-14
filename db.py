@@ -1,3 +1,4 @@
+import uuid
 from typing import AsyncGenerator
 
 from fastapi import Depends
@@ -5,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel, Session
+from sqlalchemy.future import select
 
 from images.models import Image
 
@@ -18,12 +20,18 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-async def save_entity(entity: SQLModel, session: AsyncSession = Depends(get_async_session)):
+async def save_entity(entity: SQLModel):
     async with async_session_maker() as session:
         async with session.begin():
-            session.add_all([entity])
+            session.add(entity)
         await session.commit()
 
+
+async def get_entity(entity_id: str, entity: SQLModel):
+    async with async_session_maker() as session:
+        async with session.begin():
+            result = await session.execute(select(entity).filter_by(id=entity_id))
+            return result.first()[0]
 
 
 async_session_maker = sessionmaker(ENGINE, class_=AsyncSession, expire_on_commit=False)

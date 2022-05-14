@@ -7,7 +7,7 @@ class DeletableModel(SQLModel):
 
 
 class UUIDModel(SQLModel):
-    id: uuid_lib.UUID = Field(
+    id: str = Field(
         default_factory=uuid_lib.uuid4,
         primary_key=True,
         index=True,
