@@ -1,11 +1,7 @@
 from fastapi import FastAPI, Depends
 
-from shows.db import init_db
-from shows.models import Show
-from users.authentication.auth_backend import auth_backend
-from users.db_adapter import create_db_and_tables
-from users.models import UserDB
-from users.users import fastapi_users, current_active_user
+from shows import shows_router
+from users import auth_backend, UserDB, fastapi_users, current_active_user
 
 app = FastAPI()
 
@@ -24,6 +20,8 @@ app.include_router(
     tags=["auth"],
 )
 app.include_router(fastapi_users.get_users_router(), prefix="/users", tags=["users"])
+app.include_router(shows_router, tags=["shows"])
+
 
 @app.get("/")
 async def root():
@@ -34,10 +32,10 @@ async def root():
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
+
 @app.get("/authenticated-route")
 async def authenticated_route(user: UserDB = Depends(current_active_user)):
     return {"message": f"Hello {user.email}!"}
-
 
 
 @app.get("/url-list")
