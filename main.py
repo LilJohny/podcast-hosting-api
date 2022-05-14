@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 
+from images import images_router
 from shows import shows_router
 from users import auth_backend, UserDB, fastapi_users, current_active_user
 
@@ -21,7 +22,7 @@ app.include_router(
 )
 app.include_router(fastapi_users.get_users_router(), prefix="/users", tags=["users"])
 app.include_router(shows_router, tags=["shows"])
-
+app.include_router(images_router, tags=["images"])
 
 @app.get("/")
 async def root():
