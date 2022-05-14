@@ -1,11 +1,12 @@
 import uuid
 from fastapi import status, APIRouter
+from shows.models import ShowBase
 
 shows_router = APIRouter(prefix="/shows")
 
 
 @shows_router.post("/create", status_code=status.HTTP_201_CREATED)
-def create_show():
+def create_show(show:ShowBase):
     pass
 
 

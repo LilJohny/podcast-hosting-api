@@ -4,6 +4,7 @@ import uuid as uuid_lib
 
 from pydantic import AnyUrl, FileUrl
 from sqlmodel import SQLModel, Field, Enum, Column
+from models import DeletableModel, UUIDModel
 
 
 class Language(str, enum.Enum):
@@ -17,7 +18,6 @@ class Category(str, enum.Enum):
 class ImageBase(SQLModel):
     file_url: FileUrl
     title: str
-    show_link: AnyUrl = Field(default=None, foreign_key="show.show_link")
 
 
 class ShowBase(SQLModel):
@@ -35,20 +35,9 @@ class ShowBase(SQLModel):
     category: Category = Field(sa_column=Column(Enum(Category)))
 
 
-class Image(ImageBase, table=True):
-    id: uuid_lib.UUID = Field(
-        default_factory=uuid_lib.uuid4,
-        primary_key=True,
-        index=True,
-        nullable=False,
-    )
+class Image(ImageBase, UUIDModel, DeletableModel, table=True):
+    pass
 
 
-class Show(ShowBase, table=True):
-    id: uuid_lib.UUID = Field(
-        default_factory=uuid_lib.uuid4,
-        primary_key=True,
-        index=True,
-        nullable=False,
-    )
+class Show(ShowBase, UUIDModel, DeletableModel, table=True):
     image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
