@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends
 
+from shows.db import init_db
+from shows.models import Show
 from users.authentication.auth_backend import auth_backend
 from users.db_adapter import create_db_and_tables
 from users.models import UserDB
@@ -41,6 +43,7 @@ async def authenticated_route(user: UserDB = Depends(current_active_user)):
 async def on_startup():
     # Not needed if you setup a migration system like Alembic
     await create_db_and_tables()
+    await init_db()
 
 @app.get("/url-list")
 def get_all_urls():

@@ -1,6 +1,8 @@
 aiosqlite==0.17.0
+alembic==1.7.1
 anyio==3.5.0
 asgiref==3.5.0
+asyncpg==0.24.0
 bcrypt==3.2.0
 cffi==1.15.0
 click==8.1.2
@@ -14,8 +16,13 @@ greenlet==1.1.2
 h11==0.13.0
 httptools==0.4.0
 idna==3.3
+importlib-resources==5.7.1
 makefun==1.13.1
+Mako==1.2.0
+MarkupSafe==2.1.1
 passlib==1.7.4
+pip-autoremove==0.10.0
+psycopg2-binary==2.9.1
 pycparser==2.21
 pydantic==1.9.0
 PyJWT==2.3.0
@@ -25,9 +32,12 @@ PyYAML==6.0
 six==1.16.0
 sniffio==1.2.0
 SQLAlchemy==1.4.34
+sqlalchemy2-stubs==0.0.2a22
+sqlmodel==0.0.4
 starlette==0.17.1
 typing_extensions==4.1.1
 uvicorn==0.17.6
 uvloop==0.16.0
 watchgod==0.8.2
 websockets==10.2
+zipp==3.8.0
