@@ -7,7 +7,7 @@ images_router = APIRouter(prefix="/images")
 
 
 @images_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_image(image_param: ImageBase):
+async def create_image(image_param: ImageBase)->Image:
     image = Image(**image_param.dict(), is_removed=False, id=str(uuid.uuid4()))
     await save_entity(image)
     return image
