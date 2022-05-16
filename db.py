@@ -1,5 +1,5 @@
 import uuid
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Type
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -27,7 +27,7 @@ async def save_entity(entity: SQLModel):
         await session.commit()
 
 
-async def get_entity(entity_id: str, entity: SQLModel):
+async def get_entity(entity_id: str, entity: Type[SQLModel]):
     async with async_session_maker() as session:
         async with session.begin():
             result = await session.execute(select(entity).filter_by(id=entity_id))
