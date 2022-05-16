@@ -1,4 +1,5 @@
 import uuid
+
 from fastapi import status, APIRouter
 
 from db import get_entity, save_entity

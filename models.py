@@ -1,5 +1,6 @@
-from sqlmodel import SQLModel, Field
 import uuid as uuid_lib
+
+from sqlmodel import SQLModel, Field
 
 
 class DeletableModel(SQLModel):

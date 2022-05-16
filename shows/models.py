@@ -2,7 +2,7 @@ import datetime
 import enum
 import uuid as uuid_lib
 
-from pydantic import AnyUrl, FileUrl
+from pydantic import AnyUrl
 from sqlmodel import SQLModel, Field, Enum, Column
 
 from images.models import ImageDTO

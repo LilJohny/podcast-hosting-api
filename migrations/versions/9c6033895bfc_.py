@@ -5,11 +5,6 @@ Revises: 51964db740c1
 Create Date: 2022-05-14 19:22:00.024957
 
 """
-from alembic import op
-import sqlalchemy as sa
-import sqlmodel
-import fastapi_users_db_sqlalchemy
-
 
 # revision identifiers, used by Alembic.
 revision = '9c6033895bfc'

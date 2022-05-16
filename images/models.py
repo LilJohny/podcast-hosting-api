@@ -1,4 +1,4 @@
-from pydantic import  HttpUrl
+from pydantic import HttpUrl
 from sqlmodel import SQLModel
 
 from models import UUIDModel, DeletableModel
@@ -11,4 +11,3 @@ class ImageDTO(SQLModel):
 
 class Image(ImageDTO, UUIDModel, DeletableModel, table=True):
     pass
-
