@@ -9,6 +9,9 @@ from sqlmodel import SQLModel
 from alembic import context
 
 from shows.models import Show
+from episodes.models import Episode
+from images.models import Image
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -22,7 +25,10 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 from users.db_adapter import Base
+
+
 target_metadata = SQLModel.metadata, Base.metadata
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
