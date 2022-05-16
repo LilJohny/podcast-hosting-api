@@ -1,14 +1,10 @@
-import uuid
 from typing import AsyncGenerator, Type
 
-from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlmodel import SQLModel, Session
 from sqlalchemy.future import select
-
-from images.models import Image
+from sqlalchemy.orm import sessionmaker
+from sqlmodel import SQLModel
 
 DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 Base: DeclarativeMeta = declarative_base()
