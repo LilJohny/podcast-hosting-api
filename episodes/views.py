@@ -3,13 +3,13 @@ import uuid
 from fastapi import APIRouter, status
 
 from db import get_entity, save_entity
-from episodes.models import EpisodeBase, Episode
+from episodes.models import EpisodeDTO, Episode
 
 episodes_router = APIRouter(prefix="/episodes")
 
 
 @episodes_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_episode(episode_param: EpisodeBase) -> Episode:
+async def create_episode(episode_param: EpisodeDTO) -> Episode:
     episode = Episode(**episode_param.dict(), is_removed=False, id=str(uuid.uuid4()))
     await save_entity(episode)
     return episode
@@ -24,7 +24,7 @@ async def delete_episode(episode_id: str):
 
 
 @episodes_router.put("/{episode_id}", status_code=status.HTTP_200_OK)
-async def update_episode(episode_id: str, episode_param: EpisodeBase) -> Episode:
+async def update_episode(episode_id: str, episode_param: EpisodeDTO) -> Episode:
     episode = await get_entity(episode_id, Episode)
     episode_data = episode.dict()
     episode_data.update(episode_param.dict())
@@ -34,9 +34,9 @@ async def update_episode(episode_id: str, episode_param: EpisodeBase) -> Episode
 
 
 @episodes_router.get("/{episode_id}")
-async def read_episode(episode_id: str) -> EpisodeBase:
+async def read_episode(episode_id: str) -> EpisodeDTO:
     image = await get_entity(episode_id, Episode)
-    return EpisodeBase(**image.dict())
+    return EpisodeDTO(**image.dict())
 
 
 @episodes_router.get("/")

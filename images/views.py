@@ -1,13 +1,13 @@
 import uuid
 from fastapi import status, APIRouter
-from images.models import ImageBase, Image
+from images.models import ImageDTO, Image
 from db import save_entity, get_entity
 
 images_router = APIRouter(prefix="/images")
 
 
 @images_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_image(image_param: ImageBase)->Image:
+async def create_image(image_param: ImageDTO)->Image:
     image = Image(**image_param.dict(), is_removed=False, id=str(uuid.uuid4()))
     await save_entity(image)
     return image
@@ -22,6 +22,6 @@ async def delete_image(image_id: str):
 
 
 @images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
-async def read_image(image_id: str) -> ImageBase:
+async def read_image(image_id: str) -> ImageDTO:
     image = await get_entity(image_id, Image)
-    return ImageBase(**image.dict())
+    return ImageDTO(**image.dict())

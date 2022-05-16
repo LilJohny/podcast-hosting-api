@@ -4,11 +4,11 @@ from sqlmodel import SQLModel
 from models import UUIDModel, DeletableModel
 
 
-class ImageBase(SQLModel):
+class ImageDTO(SQLModel):
     file_url: HttpUrl
     title: str
 
 
-class Image(ImageBase, UUIDModel, DeletableModel, table=True):
+class Image(ImageDTO, UUIDModel, DeletableModel, table=True):
     pass
 

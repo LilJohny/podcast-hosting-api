@@ -11,7 +11,7 @@ class EpisodeType(str, enum.Enum):
     full = "full"
 
 
-class EpisodeBase(SQLModel):
+class EpisodeDTO(SQLModel):
     title: str
     description: str
     episode_link: HttpUrl
@@ -26,5 +26,5 @@ class EpisodeBase(SQLModel):
     episode_type: EpisodeType = Field(sa_column=Column(Enum(EpisodeType)))
 
 
-class Episode(EpisodeBase, UUIDModel, DeletableModel, table=True):
+class Episode(EpisodeDTO, UUIDModel, DeletableModel, table=True):
     pass

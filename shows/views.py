@@ -2,13 +2,13 @@ import uuid
 from fastapi import status, APIRouter
 
 from db import get_entity, save_entity
-from shows.models import ShowBase, Show
+from shows.models import ShowDTO, Show
 
 shows_router = APIRouter(prefix="/shows")
 
 
 @shows_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_show(show_param: ShowBase) -> ShowBase:
+async def create_show(show_param: ShowDTO) -> ShowDTO:
     show = Show(**show_param.dict(), is_removed=False, id=str(uuid.uuid4()))
     await save_entity(show)
     return show
@@ -23,7 +23,7 @@ async def delete_show(show_id: str):
 
 
 @shows_router.put("/{show_id}")
-async def update_show(show_id: str, show_param: ShowBase) -> Show:
+async def update_show(show_id: str, show_param: ShowDTO) -> Show:
     show = await get_entity(show_id, Show)
     show_data = show.dict()
     show_data.update(show_param.dict())
@@ -33,9 +33,9 @@ async def update_show(show_id: str, show_param: ShowBase) -> Show:
 
 
 @shows_router.get("/{show_id}")
-async def read_show(show_id: str) -> ShowBase:
+async def read_show(show_id: str) -> ShowDTO:
     image = await get_entity(show_id, Show)
-    return ShowBase(**image.dict())
+    return ShowDTO(**image.dict())
 
 
 @shows_router.get("/")

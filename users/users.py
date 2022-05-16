@@ -1,13 +1,13 @@
 from fastapi_users import FastAPIUsers
 
 from users.authentication.auth_backend import auth_backend
-from users.models import UserDB, UserUpdate, UserCreate, User
+from users.models import UserDB, UserUpdate, UserCreate, UserDTO
 from users.user_manager import get_user_manager
 
 fastapi_users = FastAPIUsers(
     get_user_manager,
     [auth_backend],
-    User,
+    UserDTO,
     UserCreate,
     UserUpdate,
     UserDB,
