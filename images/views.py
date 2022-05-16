@@ -21,10 +21,7 @@ async def delete_image(image_id: str):
     return status.HTTP_202_ACCEPTED
 
 
-
-
 @images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
 async def read_image(image_id: str) -> ImageBase:
     image = await get_entity(image_id, Image)
     return ImageBase(**image.dict())
-
