@@ -1,9 +1,10 @@
-from typing import AsyncGenerator, Type
+from typing import AsyncGenerator, Type, List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import SQLModel
 
 DATABASE_URL = "sqlite+aiosqlite:///./test.db"
@@ -30,10 +31,14 @@ async def get_entity(entity_id: str, entity: Type[SQLModel]):
             return result.first()[0]
 
 
-async def get_entities(entity: Type[SQLModel]):
+async def get_entities(entity: Type[SQLModel], conditions: Optional[List[BinaryExpression]]):
     async with async_session_maker() as session:
         async with session.begin():
-            result = await session.execute(select(entity))
+            query = select(entity)
+            if conditions:
+                for condition in conditions:
+                    query = query.where(condition)
+            result = await session.execute(query)
     return [row[0] for row in result.all()]
 
 
