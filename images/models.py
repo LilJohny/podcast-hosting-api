@@ -5,7 +5,7 @@ from models import UUIDModel, DeletableModel
 
 
 class ImageDTO(SQLModel):
-    file_url: HttpUrl
+    file_url: str
     title: str
 
 

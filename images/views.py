@@ -1,17 +1,22 @@
 import uuid
 
-from fastapi import status, APIRouter, Depends
-from fastapi_pagination import paginate, Page, add_pagination, Params
+from deta import Deta
+from fastapi import status, APIRouter, Depends, UploadFile, File
+from fastapi_pagination import paginate, Page, Params
 
 from db import save_entity, get_entity, get_entities
 from images.models import ImageDTO, Image
 
 images_router = APIRouter(prefix="/images")
 
+deta = Deta(project_key="a07qpkhz_b5Qn6LCt76CJM9r7tYqcwimtHoM8zEqg", project_id="a07qpkhz")
+images_drive = deta.Drive("images")
 
 @images_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_image(image_param: ImageDTO) -> Image:
-    image = Image(**image_param.dict(), is_removed=False)
+async def create_image(image_title:str, image_file: UploadFile = File(...)) -> Image:
+    path = image_file.filename
+    image_url = images_drive.put(path, image_file.file)
+    image = Image(title=image_title, file_url=f"https://a", is_removed=False)
     await save_entity(image)
     return image
 

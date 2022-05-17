@@ -1,5 +1,6 @@
 import uuid
 
+from deta import Deta
 from fastapi import APIRouter, status, Depends
 from fastapi_pagination import Params, paginate, Page
 
@@ -8,6 +9,8 @@ from episodes.models import EpisodeDTO, Episode
 
 episodes_router = APIRouter(prefix="/episodes")
 
+deta = Deta(project_key="a07qpkhz_b5Qn6LCt76CJM9r7tYqcwimtHoM8zEqg", project_id="a07qpkhz")
+images_drive = deta.Drive("images")
 
 @episodes_router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_episode(episode_param: EpisodeDTO) -> Episode:
