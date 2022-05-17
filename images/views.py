@@ -1,8 +1,9 @@
 import uuid
 
-from fastapi import status, APIRouter
+from fastapi import status, APIRouter, Depends
+from fastapi_pagination import paginate, Page, add_pagination, Params
 
-from db import save_entity, get_entity
+from db import save_entity, get_entity, get_entities
 from images.models import ImageDTO, Image
 
 images_router = APIRouter(prefix="/images")
@@ -27,3 +28,9 @@ async def delete_image(image_id: str):
 async def read_image(image_id: uuid.UUID) -> ImageDTO:
     image = await get_entity(str(image_id), Image)
     return ImageDTO(**image.dict())
+
+
+@images_router.get("/", response_model=Page[Image])
+async def list_images(params: Params = Depends()):
+    images = await get_entities(Image)
+    return paginate(images, params)

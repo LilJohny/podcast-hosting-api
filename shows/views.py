@@ -1,5 +1,5 @@
-from fastapi import status, APIRouter
-from fastapi_pagination import Page, paginate
+from fastapi import status, APIRouter, Depends
+from fastapi_pagination import Page, paginate, Params
 
 from db import get_entity, save_entity, get_entities
 from shows.models import ShowDTO, Show
@@ -34,11 +34,11 @@ async def update_show(show_id: str, show_param: ShowDTO) -> Show:
 
 @shows_router.get("/{show_id}")
 async def read_show(show_id: str) -> ShowDTO:
-    image = await get_entity(show_id, Show)
-    return ShowDTO(**image.dict())
+    show = await get_entity(show_id, Show)
+    return ShowDTO(**show.dict())
 
 
 @shows_router.get("/", response_model=Page[ShowDTO])
-async def list_show():
+async def list_show(params: Params = Depends()):
     shows = await get_entities(Show)
-    return paginate(shows)
+    return paginate(shows, params)

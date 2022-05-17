@@ -34,7 +34,7 @@ async def get_entities(entity: Type[SQLModel]):
     async with async_session_maker() as session:
         async with session.begin():
             result = await session.execute(select(entity))
-            return result.all()
+    return [row[0] for row in result.all()]
 
 
 async_session_maker = sessionmaker(ENGINE, class_=AsyncSession, expire_on_commit=False)
