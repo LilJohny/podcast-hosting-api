@@ -10,7 +10,7 @@ episodes_router = APIRouter(prefix="/episodes")
 
 @episodes_router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_episode(episode_param: EpisodeDTO) -> Episode:
-    episode = Episode(**episode_param.dict(), is_removed=False, id=str(uuid.uuid4()))
+    episode = Episode(**episode_param.dict(), is_removed=False)
     await save_entity(episode)
     return episode
 

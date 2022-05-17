@@ -6,10 +6,12 @@ from sqlmodel import SQLModel, Field
 class DeletableModel(SQLModel):
     is_removed: bool
 
+def str_uuid_factory():
+    return str(uuid_lib.uuid4())
 
 class UUIDModel(SQLModel):
     id: str = Field(
-        default_factory=uuid_lib.uuid4,
+        default_factory=str_uuid_factory,
         primary_key=True,
         index=True,
         nullable=False,

@@ -10,7 +10,7 @@ shows_router = APIRouter(prefix="/shows")
 
 @shows_router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_show(show_param: ShowDTO) -> ShowDTO:
-    show = Show(**show_param.dict(), is_removed=False, id=str(uuid.uuid4()))
+    show = Show(**show_param.dict(), is_removed=False)
     await save_entity(show)
     return show
 
