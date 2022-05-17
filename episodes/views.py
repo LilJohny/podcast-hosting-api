@@ -1,8 +1,9 @@
 import uuid
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
+from fastapi_pagination import Params, paginate, Page
 
-from db import get_entity, save_entity
+from db import get_entity, save_entity, get_entities
 from episodes.models import EpisodeDTO, Episode
 
 episodes_router = APIRouter(prefix="/episodes")
@@ -39,6 +40,7 @@ async def read_episode(episode_id: str) -> EpisodeDTO:
     return EpisodeDTO(**image.dict())
 
 
-@episodes_router.get("/")
-def list_episode():
-    pass
+@episodes_router.get("/", response_model=Page[Episode])
+async def list_episode(params: Params = Depends()):
+    episodes = await get_entities(Episode)
+    return paginate(episodes, params)
