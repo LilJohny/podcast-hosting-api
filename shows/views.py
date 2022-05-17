@@ -1,8 +1,7 @@
-import uuid
-
 from fastapi import status, APIRouter
+from fastapi_pagination import Page, paginate
 
-from db import get_entity, save_entity
+from db import get_entity, save_entity, get_entities
 from shows.models import ShowDTO, Show
 
 shows_router = APIRouter(prefix="/shows")
@@ -39,6 +38,7 @@ async def read_show(show_id: str) -> ShowDTO:
     return ShowDTO(**image.dict())
 
 
-@shows_router.get("/")
-def list_show():
-    pass
+@shows_router.get("/", response_model=Page[ShowDTO])
+async def list_show():
+    shows = await get_entities(Show)
+    return paginate(shows)
