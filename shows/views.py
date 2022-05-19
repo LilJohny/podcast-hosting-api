@@ -1,5 +1,5 @@
 import uuid
-from typing import List
+from typing import List, Optional
 
 from fastapi import status, APIRouter, Depends
 from fastapi_pagination import Page, paginate, Params
@@ -43,8 +43,9 @@ async def read_show(show_id: uuid.UUID) -> ShowDTO:
 
 
 @shows_router.get("/", response_model=Page[ShowDTO])
-async def list_show(params: Params = Depends()):
-    shows = await get_entities(Show)
+async def list_show(show_name: Optional[str] = None, params: Params = Depends()):
+    filtering_condition = Show.title == show_name if show_name else None
+    shows = await get_entities(Show, [filtering_condition])
     return paginate(shows, params)
 
 

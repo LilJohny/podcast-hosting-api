@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 
 from deta import Deta
 from fastapi import APIRouter, status, Depends
@@ -44,6 +45,13 @@ async def read_episode(episode_id: str) -> EpisodeDTO:
 
 
 @episodes_router.get("/", response_model=Page[Episode])
-async def list_episode(params: Params = Depends()):
-    episodes = await get_entities(Episode)
+async def list_episode(show_id: Optional[uuid.UUID] = None,
+                       series: Optional[str] = None,
+                       episode_title: Optional[str] = None,
+                       params: Params = Depends()):
+    conditions = [(model_field == field_val) for model_field, field_val in [(Episode.show_id, show_id),
+                                                                            (Episode.series, series),
+                                                                            (Episode.title, episode_title)]]
+
+    episodes = await get_entities(Episode, conditions)
     return paginate(episodes, params)
