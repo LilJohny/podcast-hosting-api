@@ -31,7 +31,7 @@ async def get_entity(entity_id: str, entity: Type[SQLModel]):
             return result.first()[0]
 
 
-async def get_entities(entity: Type[SQLModel], conditions: Optional[List[BinaryExpression]]):
+async def get_entities(entity: Type[SQLModel], conditions: Optional[List[BinaryExpression]]=None):
     async with async_session_maker() as session:
         async with session.begin():
             query = select(entity)
