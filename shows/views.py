@@ -1,4 +1,5 @@
 import uuid
+from typing import List
 
 from fastapi import status, APIRouter, Depends
 from fastapi_pagination import Page, paginate, Params
@@ -49,5 +50,10 @@ async def list_show(params: Params = Depends()):
 
 @shows_router.get("/my/all", response_model=Page[Show])
 async def shows_my(params: Params = Depends(), user: UserDB = Depends(current_active_user)):
-    shows = await get_entities(Show, [(Show.podcast_owner==str(user.id))])
+    shows = await get_entities(Show, [(Show.podcast_owner == str(user.id))])
     return paginate(shows, params)
+
+
+@shows_router.get('/featured')
+async def featured_shows() -> List[Show]:
+    pass
