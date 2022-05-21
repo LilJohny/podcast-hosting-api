@@ -5,7 +5,7 @@ from deta import Deta
 from fastapi import APIRouter, status, Depends
 from fastapi_pagination import Params, paginate, Page
 
-from db import get_entity, save_entity, get_entities
+from settings import get_entity, save_entity, get_entities
 from episodes.models import EpisodeDTO, Episode
 
 episodes_router = APIRouter(prefix="/episodes")

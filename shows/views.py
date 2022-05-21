@@ -4,7 +4,7 @@ from typing import List, Optional
 from fastapi import status, APIRouter, Depends
 from fastapi_pagination import Page, paginate, Params
 
-from db import get_entity, save_entity, get_entities
+from settings import get_entity, save_entity, get_entities
 from shows.models import ShowDTO, Show
 from users import UserDB, current_active_user
 

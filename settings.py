@@ -1,6 +1,7 @@
 import os
 from typing import AsyncGenerator, Type, List, Optional
 
+import aioboto3
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.future import select
