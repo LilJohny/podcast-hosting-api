@@ -1,6 +1,7 @@
 import datetime
 import enum
 import uuid as uuid_lib
+from typing import List
 
 from pydantic import AnyUrl
 from sqlmodel import SQLModel, Field, Enum, Column
@@ -30,6 +31,7 @@ class ShowParam(SQLModel):
     podcast_owner: str
     is_locked: bool
     category: Category = Field(sa_column=Column(Enum(Category)))
+    series: List[str]
 
 
 class ShowResponse(ShowParam, UUIDModel):
