@@ -1,14 +1,19 @@
 """empty message
 
-Revision ID: d2a6b1c7eed0
-Revises: 9c6033895bfc
-Create Date: 2022-05-16 23:43:08.875723
+Revision ID: 8a6b2dda4a1a
+Revises: 8013ccc8e0af
+Create Date: 2022-05-21 14:36:31.602338
 
 """
+from alembic import op
+import sqlalchemy as sa
+import sqlmodel
+import fastapi_users_db_sqlalchemy
+
 
 # revision identifiers, used by Alembic.
-revision = 'd2a6b1c7eed0'
-down_revision = '9c6033895bfc'
+revision = '8a6b2dda4a1a'
+down_revision = '8013ccc8e0af'
 branch_labels = None
 depends_on = None
 

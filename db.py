@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import SQLModel
 
-DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+DATABASE_URL = "postgresql+asyncpg://LilJohny:3q3bL_UdgXYiy3XCe6YNTSXaxFiuE@db.bit.io/LilJohny/podcast_hosting_db"
 Base: DeclarativeMeta = declarative_base()
 ENGINE = create_async_engine(DATABASE_URL)
 
