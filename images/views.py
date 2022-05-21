@@ -1,10 +1,10 @@
 import uuid
 
-from fastapi import status, APIRouter, Depends, UploadFile, File
+from fastapi import status, APIRouter, Depends, UploadFile, File, HTTPException
 from fastapi_pagination import paginate, Page, Params
 
 from file_utils import upload_file_to_s3, FileKind, get_s3_key
-from images.models import ImageParam, Image, ImageResponse
+from images.models import Image, ImageResponse
 from settings import save_entity, get_entity, get_entities
 from utils import serialize
 
@@ -31,7 +31,10 @@ async def delete_image(image_id: uuid.UUID):
 @images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
 async def read_image(image_id: uuid.UUID) -> ImageResponse:
     image = await get_entity(str(image_id), Image)
-    return serialize(image, ImageResponse, many=True)
+    if image:
+        return serialize(image, ImageResponse)
+    else:
+        raise HTTPException(status_code=404, detail="Image not found")
 
 
 @images_router.get("/", response_model=Page[ImageResponse])

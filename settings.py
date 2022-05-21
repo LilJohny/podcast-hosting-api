@@ -40,7 +40,8 @@ async def get_entity(entity_id: str, entity: Type[SQLModel]):
     async with async_session_maker() as session:
         async with session.begin():
             result = await session.execute(select(entity).filter_by(id=entity_id, is_removed=False))
-            return result.first()[0]
+            item = result.first()
+    return item[0] if item else None
 
 
 async def get_entities(entity: Type[SQLModel], conditions: Optional[List[BinaryExpression]] = None):
