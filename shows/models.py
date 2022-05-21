@@ -40,4 +40,5 @@ class ShowResponse(ShowParam, UUIDModel):
 
 
 class Show(ShowResponse, DeletableModel, table=True):
+    feed_file_link: str
     pass

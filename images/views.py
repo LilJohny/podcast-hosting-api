@@ -12,12 +12,12 @@ images_router = APIRouter(prefix="/images")
 
 
 @images_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_image(image_param: ImageParam, image_file: UploadFile = File(...)) -> ImageResponse:
-    s3_key = get_s3_key(image_file.filename, image_param.title)
+async def create_image(image_title: str, image_file: UploadFile = File(...)) -> ImageResponse:
+    s3_key = get_s3_key(image_file.filename, image_title)
     image_url = await upload_file_to_s3(s3_key, image_file.file, FileKind.IMAGE)
-    image = Image(title=image_param.title, file_url=image_url, is_removed=False)
+    image = Image(title=image_title, file_url=image_url, is_removed=False)
     await save_entity(image)
-    return serialize(image, ImageResponse, many=True)
+    return serialize(image, ImageResponse)
 
 
 @images_router.delete("/{image_id}", status_code=status.HTTP_202_ACCEPTED)

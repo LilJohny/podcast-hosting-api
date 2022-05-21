@@ -3,7 +3,7 @@ from typing import Optional
 
 
 @dataclasses.dataclass
-class Image:
+class ImageDTO:
     url: str
     title: str
     link: str
@@ -12,12 +12,12 @@ class Image:
 
 
 @dataclasses.dataclass
-class PodcastOwner:
+class PodcastOwnerDTO:
     name: str
     email: str
 
 
 @dataclasses.dataclass
-class GUIDData:
+class GUIDDataDTO:
     url: str
     isPermalink: bool

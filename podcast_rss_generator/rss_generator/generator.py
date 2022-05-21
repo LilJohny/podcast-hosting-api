@@ -10,7 +10,7 @@ from .elements import DEFAULT_ETREE, GUIDElement, EnclosureElement, ItemElement,
     ItunesCategoryElement
 from .constants import MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT
 from .helpers import el_to_str, datetime_to_str, cdata_wrap, to_xml_bool, to_xml_bool_word, p_tag_wrap
-from .types import GUIDData, PodcastOwner, Image
+from .types import GUIDDataDTO, PodcastOwnerDTO, ImageDTO
 
 
 def add_subelement_with_text(
@@ -264,8 +264,8 @@ def generate_rss(
         lastBuildDate: Optional[str],
         category: Optional[str],
         generator: Optional[str],
-        image: Optional[Image],
-        podcast_owner: PodcastOwner,
+        image: Optional[ImageDTO],
+        podcast_owner: PodcastOwnerDTO,
         podcast_type: PodcastType = PodcastType.EPISODIC,
         is_explicit=False,
         is_locked=False,
@@ -342,7 +342,7 @@ def gen_episode(
         episode_link: str,
         file_link: str,
         cover_image_link: str,
-        episode_guid: GUIDData,
+        episode_guid: GUIDDataDTO,
         episode_num: int,
         season_num: int,
         explicit: bool,

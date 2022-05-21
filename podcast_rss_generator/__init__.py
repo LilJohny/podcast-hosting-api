@@ -1,11 +1,11 @@
 import datetime
 
-from enums import PodcastType, EpisodeType
-from rss_generator import generate_rss, gen_image, PODCAST_ATTRS, XML_LANG, gen_itunes_image, gen_itunes_explicit, \
+from .enums import PodcastType, EpisodeType
+from .rss_generator import generate_rss, gen_image, PODCAST_ATTRS, XML_LANG, gen_itunes_image, gen_itunes_explicit, \
     gen_itunes_author, gen_atom_link, gen_itunes_summary, gen_podcast_locked, gen_itunes_type, gen_itunes_owner, \
     gen_episode
-from rss_generator.helpers import el_to_str, cdata_wrap, datetime_to_str
-from rss_generator.types import Image, PodcastOwner, GUIDData
+from .rss_generator.helpers import el_to_str, cdata_wrap, datetime_to_str
+from .rss_generator.types import ImageDTO, PodcastOwnerDTO, GUIDDataDTO
 
 RSS_FILENAME = "current.xml"
 
@@ -18,8 +18,8 @@ def generate_new_show_rss_feed(show_title: str,
                                language: str,
                                copyright_: str,
                                last_build_date: datetime.datetime,
-                               image: Image,
-                               podcast_owner: PodcastOwner,
+                               image: ImageDTO,
+                               podcast_owner: PodcastOwnerDTO,
                                podcast_type: PodcastType = PodcastType.EPISODIC,
                                is_explicit=False,
                                is_locked=False,
@@ -29,7 +29,7 @@ def generate_new_show_rss_feed(show_title: str,
                      "https://rss.com/podcasts/testpodcasting/475976",
                      "https://media.rss.com/testpodcasting/20220504_040519_89a86b81ff448fff9303b41c2f249c08.mp3",
                      "https://media.rss.com/testpodcasting/20220504_040548_0072f1134aae6c3a898059c08998ba9b.jpg",
-                     episode_guid=GUIDData("847fa074-cc18-408f-a83b-47f0e0cb394e", False),
+                     episode_guid=GUIDDataDTO("847fa074-cc18-408f-a83b-47f0e0cb394e", False),
                      season_num=1,
                      episode_num=1,
                      explicit=True,
@@ -76,11 +76,11 @@ if __name__ == '__main__':
         language="en",
         copyright_="Test 2022",
         last_build_date=datetime.datetime.today(),
-        image=Image(
+        image=ImageDTO(
             url="https://media.rss.com/testpodcasting/20220430_080454_9918224fc00636a22c6e36616b92f36c.jpg",
             title="Test podcast",
             link="https://rss.com/podcasts/testpodcasting"
         ),
-        podcast_owner=PodcastOwner(name="Test test", email="little.johny@hotmail.com"),
+        podcast_owner=PodcastOwnerDTO(name="Test test", email="little.johny@hotmail.com"),
         is_locked=True
     )
