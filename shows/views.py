@@ -46,8 +46,8 @@ async def read_show(show_id: uuid.UUID) -> ShowResponse:
 @shows_router.get("/", response_model=Page[ShowResponse])
 async def list_show(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends()):
     conditions = [(model_field == field_val) for model_field, field_val in [(Show.title, show_name),
-                                                               (Show.featured, featured)
-                                                               ] if field_val is not None]
+                                                                            (Show.featured, featured)
+                                                                            ] if field_val is not None]
     shows = await get_entities(Show, conditions)
     shows = serialize(shows, ShowResponse, many=True)
     return paginate(shows, params)
@@ -60,6 +60,3 @@ async def list_my_shows(params: Params = Depends(), user: UserDB = Depends(curre
     return paginate(shows, params)
 
 
-@shows_router.get('/featured')
-async def featured_shows() -> List[Show]:
-    pass
