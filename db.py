@@ -1,3 +1,4 @@
+import os
 from typing import AsyncGenerator, Type, List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -7,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import SQLModel
 
-DATABASE_URL = "postgresql+asyncpg://onqiltynmofxpy:7ca447c03bda43893819f8568920e179737b6caa2cfb0c1401031a0c7d06a056@ec2-52-48-159-67.eu-west-1.compute.amazonaws.com:5432/derl13vlesrvi3"
+DATABASE_URL = os.getenv('ASYNC_DATABASE_URL')
 Base: DeclarativeMeta = declarative_base()
 ENGINE = create_async_engine(DATABASE_URL)
 
