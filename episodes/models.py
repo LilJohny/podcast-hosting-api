@@ -15,8 +15,6 @@ class EpisodeType(str, enum.Enum):
 class EpisodeDTO(SQLModel):
     title: str
     description: str
-    episode_link: HttpUrl
-    file_link: HttpUrl
     cover_image_link: HttpUrl
     episode_guid: str
     episode_num: int
@@ -30,4 +28,5 @@ class EpisodeDTO(SQLModel):
 
 
 class Episode(EpisodeDTO, UUIDModel, DeletableModel, table=True):
-    pass
+    file_link: HttpUrl
+    episode_link: HttpUrl
