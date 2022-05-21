@@ -38,12 +38,12 @@ async def delete_show(show_id: uuid.UUID):
 
 @shows_router.put("/{show_id}")
 async def update_show(show_id: uuid.UUID, show_param: ShowParam) -> ShowResponse:
+    show_param.last_build_date = show_param.last_build_date.replace(tzinfo=None)
     show = await get_entity(str(show_id), Show)
     if not show:
         raise HTTPException(status_code=404, detail="Show not found")
-    show_data = show.dict()
-    show_data.update(show_param.dict())
-    show = Show(**show_data)
+    for key, val in show_param.dict().items():
+        setattr(show, key, val)
     await save_entity(show)
     return serialize(show, ShowResponse)
 
