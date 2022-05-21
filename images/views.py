@@ -1,4 +1,3 @@
-import os
 import uuid
 
 from fastapi import status, APIRouter, Depends, UploadFile, File

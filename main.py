@@ -27,7 +27,6 @@ app.include_router(images_router, tags=["images"])
 app.include_router(episodes_router, tags=["episodes"])
 
 
-
 @app.get("/")
 async def root():
     return {"message": "Hello World"}

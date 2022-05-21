@@ -1,4 +1,3 @@
-from pydantic import HttpUrl
 from sqlmodel import SQLModel
 
 from models import UUIDModel, DeletableModel
