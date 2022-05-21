@@ -20,6 +20,10 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 from users.db_adapter import Base
+from episodes.models import Episode
+from images.models import Image
+from shows.models import Show
+
 
 target_metadata = SQLModel.metadata, Base.metadata
 
