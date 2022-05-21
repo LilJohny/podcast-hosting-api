@@ -23,6 +23,8 @@ async def create_image(image_title: str, image_file: UploadFile = File(...)) -> 
 @images_router.delete("/{image_id}", status_code=status.HTTP_202_ACCEPTED)
 async def delete_image(image_id: uuid.UUID):
     image = await get_entity(str(image_id), Image)
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
     image.is_removed = True
     await save_entity(image)
     return status.HTTP_202_ACCEPTED

@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, status, Depends, UploadFile, File
+from fastapi import APIRouter, status, Depends, UploadFile, File, HTTPException
 from fastapi_pagination import Params, paginate, Page
 
 from episodes.models import EpisodeParam, Episode, EpisodeResponse
@@ -24,6 +24,8 @@ async def create_episode(episode_param: EpisodeParam, episode_file: UploadFile =
 @episodes_router.delete("/{episode_id}", status_code=status.HTTP_202_ACCEPTED)
 async def delete_episode(episode_id: str):
     episode = await get_entity(episode_id, Episode)
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
     episode.is_removed = True
     await save_entity(episode)
     return status.HTTP_202_ACCEPTED
@@ -32,9 +34,10 @@ async def delete_episode(episode_id: str):
 @episodes_router.put("/{episode_id}", status_code=status.HTTP_200_OK)
 async def update_episode(episode_id: str, episode_param: EpisodeParam) -> EpisodeResponse:
     episode = await get_entity(episode_id, Episode)
-    episode_data = episode.dict()
-    episode_data.update(episode_param.dict())
-    episode = Episode(**episode_data)
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    for key, val in episode_param.dict().items():
+        setattr(episode, key, val)
     await save_entity(episode)
     return serialize(episode, EpisodeResponse)
 
@@ -42,6 +45,8 @@ async def update_episode(episode_id: str, episode_param: EpisodeParam) -> Episod
 @episodes_router.get("/{episode_id}")
 async def read_episode(episode_id: str) -> EpisodeResponse:
     episode = await get_entity(episode_id, Episode)
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
     return serialize(episode, EpisodeResponse)
 
 

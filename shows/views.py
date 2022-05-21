@@ -31,6 +31,8 @@ async def create_show(show_param: ShowParam, user: UserDB = Depends(current_acti
 @shows_router.delete("/{show_id}")
 async def delete_show(show_id: uuid.UUID):
     show = await get_entity(str(show_id), Show)
+    if not show:
+        raise HTTPException(status_code=404, detail="Show not found")
     show.is_removed = True
     await save_entity(show)
     return status.HTTP_202_ACCEPTED
