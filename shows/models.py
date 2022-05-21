@@ -1,12 +1,11 @@
 import datetime
 import enum
 import uuid as uuid_lib
-from typing import List
+from typing import Set
 
 from pydantic import AnyUrl
-from sqlmodel import SQLModel, Field, Enum, Column
+from sqlmodel import SQLModel, Field, Enum, Column, String, ARRAY
 
-from images.models import ImageParam
 from models import DeletableModel, UUIDModel
 
 
@@ -27,11 +26,11 @@ class ShowParam(SQLModel):
     language: Language = Field(sa_column=Column(Enum(Language)))
     show_copyright: str
     last_build_date: datetime.datetime
-    image: ImageParam
+    image: str
     podcast_owner: str
     is_locked: bool
     category: Category = Field(sa_column=Column(Enum(Category)))
-    series: List[str]
+    series: Set[str] = Field(default=None, sa_column=Column(ARRAY(String())))
     featured: bool = Field(default=False)
 
 
@@ -41,4 +40,3 @@ class ShowResponse(ShowParam, UUIDModel):
 
 class Show(ShowResponse, DeletableModel, table=True):
     feed_file_link: str
-    pass

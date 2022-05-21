@@ -16,7 +16,8 @@ shows_router = APIRouter(prefix="/shows")
 
 @shows_router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_show(show_param: ShowParam, user: UserDB = Depends(current_active_user)) -> ShowResponse:
-    show = Show(**show_param.dict(), is_removed=False)
+    show_param.last_build_date = show_param.last_build_date.replace(tzinfo=None)
+    show = Show(**show_param.dict(), feed_file_link="feed.xml", is_removed=False)
     image_data = await get_entity(str(show.image), Image)
     image = ImageDTO(title=image_data.title, url=image_data.file_url, height=100, width=100, link='')
     rss_feed = generate_new_show_rss_feed(show.title, '', '', show.description, 'LilJohny generator', show.language,
