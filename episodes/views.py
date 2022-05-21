@@ -1,4 +1,3 @@
-import os
 import uuid
 from typing import Optional
 
@@ -6,17 +5,16 @@ from fastapi import APIRouter, status, Depends, UploadFile, File
 from fastapi_pagination import Params, paginate, Page
 
 from episodes.models import EpisodeDTO, Episode
-from file_utils import upload_file_to_s3, FileKind
+from file_utils import upload_file_to_s3, FileKind, get_s3_key
 from settings import get_entity, save_entity, get_entities
 
 episodes_router = APIRouter(prefix="/episodes")
 
 
 @episodes_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_episode(episode_param: EpisodeDTO, image_file: UploadFile = File(...)) -> Episode:
-    _, ext = os.path.splitext(image_file.filename)
-    s3_key = "".join([episode_param.title, ext])
-    episode_link = await upload_file_to_s3(s3_key, image_file.file, FileKind.AUDIO)
+async def create_episode(episode_param: EpisodeDTO, episode_file: UploadFile = File(...)) -> Episode:
+    s3_key = get_s3_key(episode_file.filename, episode_param.title)
+    episode_link = await upload_file_to_s3(s3_key, episode_file.file, FileKind.AUDIO)
     episode = Episode(**episode_param.dict(), file_link=episode_link, episode_link="", is_removed=False)
     await save_entity(episode)
     return episode
