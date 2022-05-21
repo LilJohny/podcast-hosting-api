@@ -39,14 +39,14 @@ async def save_entity(entity: SQLModel):
 async def get_entity(entity_id: str, entity: Type[SQLModel]):
     async with async_session_maker() as session:
         async with session.begin():
-            result = await session.execute(select(entity).filter_by(id=entity_id))
+            result = await session.execute(select(entity).filter_by(id=entity_id, is_removed=False))
             return result.first()[0]
 
 
 async def get_entities(entity: Type[SQLModel], conditions: Optional[List[BinaryExpression]] = None):
     async with async_session_maker() as session:
         async with session.begin():
-            query = select(entity)
+            query = select(entity).filter_by(is_removed=False)
             if conditions:
                 for condition in conditions:
                     query = query.where(condition)

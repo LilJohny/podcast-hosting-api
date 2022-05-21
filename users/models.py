@@ -1,7 +1,7 @@
 from fastapi_users import models
 
 
-class UserDTO(models.BaseUser):
+class UserParam(models.BaseUser):
     pass
 
 
@@ -13,5 +13,5 @@ class UserUpdate(models.BaseUserUpdate):
     pass
 
 
-class UserDB(UserDTO, models.BaseUserDB):
+class UserDB(UserParam, models.BaseUserDB):
     pass

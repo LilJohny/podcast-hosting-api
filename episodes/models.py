@@ -12,7 +12,7 @@ class EpisodeType(str, enum.Enum):
     full = "full"
 
 
-class EpisodeDTO(SQLModel):
+class EpisodeParam(SQLModel):
     title: str
     description: str
     cover_image_link: HttpUrl
@@ -27,6 +27,10 @@ class EpisodeDTO(SQLModel):
     series: str = Field(default=None, nullable=True)
 
 
-class Episode(EpisodeDTO, UUIDModel, DeletableModel, table=True):
+class EpisodeResponse(EpisodeParam, UUIDModel):
     file_link: HttpUrl
     episode_link: HttpUrl
+
+
+class Episode(EpisodeResponse, DeletableModel, table=True):
+    pass

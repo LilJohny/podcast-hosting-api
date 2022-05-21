@@ -5,7 +5,7 @@ import uuid as uuid_lib
 from pydantic import AnyUrl
 from sqlmodel import SQLModel, Field, Enum, Column
 
-from images.models import ImageDTO
+from images.models import ImageParam
 from models import DeletableModel, UUIDModel
 
 
@@ -17,7 +17,7 @@ class Category(str, enum.Enum):
     arts_books = "Arts/Books"
 
 
-class ShowDTO(SQLModel):
+class ShowParam(SQLModel):
     title: str
     show_link: AnyUrl
     media_link: AnyUrl
@@ -26,11 +26,15 @@ class ShowDTO(SQLModel):
     language: Language = Field(sa_column=Column(Enum(Language)))
     show_copyright: str
     last_build_date: datetime.datetime
-    image: ImageDTO
+    image: ImageParam
     podcast_owner: str
     is_locked: bool
     category: Category = Field(sa_column=Column(Enum(Category)))
 
 
-class Show(ShowDTO, UUIDModel, DeletableModel, table=True):
+class ShowResponse(ShowParam, UUIDModel):
     image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
+
+
+class Show(ShowResponse, DeletableModel, table=True):
+    pass
