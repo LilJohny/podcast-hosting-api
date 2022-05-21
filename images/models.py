@@ -3,10 +3,13 @@ from sqlmodel import SQLModel
 from models import UUIDModel, DeletableModel
 
 
-class ImageDTO(SQLModel):
-    file_url: str
+class ImageParam(SQLModel):
     title: str
 
 
-class Image(ImageDTO, UUIDModel, DeletableModel, table=True):
-    pass
+class Image(ImageParam, UUIDModel, DeletableModel, table=True):
+    file_url: str
+
+
+class ImageResponse(ImageParam, UUIDModel):
+    file_url: str
