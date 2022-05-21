@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional
 
-from fastapi import status, APIRouter, Depends
+from fastapi import status, APIRouter, Depends, HTTPException
 from fastapi_pagination import Page, paginate, Params
 
 from images.models import Image
@@ -39,6 +39,8 @@ async def delete_show(show_id: uuid.UUID):
 @shows_router.put("/{show_id}")
 async def update_show(show_id: uuid.UUID, show_param: ShowParam) -> ShowResponse:
     show = await get_entity(str(show_id), Show)
+    if not show:
+        raise HTTPException(status_code=404, detail="Show not found")
     show_data = show.dict()
     show_data.update(show_param.dict())
     show = Show(**show_data)
@@ -49,6 +51,8 @@ async def update_show(show_id: uuid.UUID, show_param: ShowParam) -> ShowResponse
 @shows_router.get("/{show_id}")
 async def read_show(show_id: uuid.UUID) -> ShowResponse:
     show = await get_entity(str(show_id), Show)
+    if not show:
+        raise HTTPException(status_code=404, detail="Show not found")
     return serialize(show, ShowResponse)
 
 

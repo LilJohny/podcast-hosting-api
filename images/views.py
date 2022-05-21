@@ -31,10 +31,10 @@ async def delete_image(image_id: uuid.UUID):
 @images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
 async def read_image(image_id: uuid.UUID) -> ImageResponse:
     image = await get_entity(str(image_id), Image)
-    if image:
-        return serialize(image, ImageResponse)
-    else:
+    if not image:
         raise HTTPException(status_code=404, detail="Image not found")
+    return serialize(image, ImageResponse)
+
 
 
 @images_router.get("/", response_model=Page[ImageResponse])
