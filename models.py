@@ -10,7 +10,7 @@ def str_uuid_factory():
     return str(uuid_lib.uuid4())
 
 class UUIDModel(SQLModel):
-    id: str = Field(
+    id: uuid_lib.UUID = Field(
         default_factory=str_uuid_factory,
         primary_key=True,
         index=True,
