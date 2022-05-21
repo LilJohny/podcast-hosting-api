@@ -3,7 +3,7 @@ import datetime
 import functools
 from typing import Optional, Iterable, Union, Generator
 
-from enums import ITunesXML, EpisodeType, PodcastType
+from ..enums import ITunesXML, EpisodeType, PodcastType
 from .elements import DEFAULT_ETREE, GUIDElement, EnclosureElement, ItemElement, CloudElement, CategoryElement, \
     SourceElement, TextInputElement, ImageElement, ItunesImageElement, ItunesExplicitElement, ItunesAuthorElement, \
     AtomLinkElement, ItunesSummaryElement, PodcastLockedElement, ItunesOwnerElement, ItunesTypeElement, LinkElement, \
