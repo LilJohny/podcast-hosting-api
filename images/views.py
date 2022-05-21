@@ -6,6 +6,7 @@ from fastapi_pagination import paginate, Page, Params
 from file_utils import upload_file_to_s3, FileKind, get_s3_key
 from images.models import ImageParam, Image, ImageResponse
 from settings import save_entity, get_entity, get_entities
+from utils import serialize
 
 images_router = APIRouter(prefix="/images")
 
@@ -16,7 +17,7 @@ async def create_image(image_param: ImageParam, image_file: UploadFile = File(..
     image_url = await upload_file_to_s3(s3_key, image_file.file, FileKind.IMAGE)
     image = Image(title=image_param.title, file_url=image_url, is_removed=False)
     await save_entity(image)
-    return ImageResponse(**image.dict())
+    return serialize(image, ImageResponse, many=True)
 
 
 @images_router.delete("/{image_id}", status_code=status.HTTP_202_ACCEPTED)
@@ -30,11 +31,11 @@ async def delete_image(image_id: uuid.UUID):
 @images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
 async def read_image(image_id: uuid.UUID) -> ImageResponse:
     image = await get_entity(str(image_id), Image)
-    return ImageResponse(**image.dict())
+    return serialize(image, ImageResponse, many=True)
 
 
 @images_router.get("/", response_model=Page[ImageResponse])
 async def list_images(params: Params = Depends()):
     images = await get_entities(Image)
-    images = [ImageResponse(**image.dict()) for image in images]
+    images = serialize(images, ImageResponse, many=True)
     return paginate(images, params)

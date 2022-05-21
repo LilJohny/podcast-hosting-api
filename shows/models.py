@@ -32,6 +32,7 @@ class ShowParam(SQLModel):
     is_locked: bool
     category: Category = Field(sa_column=Column(Enum(Category)))
     series: List[str]
+    featured: bool = Field(default=False)
 
 
 class ShowResponse(ShowParam, UUIDModel):

@@ -7,6 +7,7 @@ from fastapi_pagination import Params, paginate, Page
 from episodes.models import EpisodeParam, Episode, EpisodeResponse
 from file_utils import upload_file_to_s3, FileKind, get_s3_key
 from settings import get_entity, save_entity, get_entities
+from utils import serialize
 
 episodes_router = APIRouter(prefix="/episodes")
 
@@ -17,7 +18,7 @@ async def create_episode(episode_param: EpisodeParam, episode_file: UploadFile =
     episode_link = await upload_file_to_s3(s3_key, episode_file.file, FileKind.AUDIO)
     episode = Episode(**episode_param.dict(), file_link=episode_link, episode_link="", is_removed=False)
     await save_entity(episode)
-    return EpisodeResponse(**episode.dict())
+    return serialize(episode, EpisodeResponse)
 
 
 @episodes_router.delete("/{episode_id}", status_code=status.HTTP_202_ACCEPTED)
@@ -35,13 +36,13 @@ async def update_episode(episode_id: str, episode_param: EpisodeParam) -> Episod
     episode_data.update(episode_param.dict())
     episode = Episode(**episode_data)
     await save_entity(episode)
-    return EpisodeResponse(**episode.dict())
+    return serialize(episode, EpisodeResponse)
 
 
 @episodes_router.get("/{episode_id}")
 async def read_episode(episode_id: str) -> EpisodeResponse:
-    image = await get_entity(episode_id, Episode)
-    return EpisodeResponse(**image.dict())
+    episode = await get_entity(episode_id, Episode)
+    return serialize(episode, EpisodeResponse)
 
 
 @episodes_router.get("/", response_model=Page[EpisodeResponse])
@@ -55,5 +56,5 @@ async def list_episode(show_id: Optional[uuid.UUID] = None,
                                                                             ] if field_val is not None]
 
     episodes = await get_entities(Episode, conditions)
-    episodes = [EpisodeResponse(**episode.dict()) for episode in episodes]
+    episodes = serialize(episodes, EpisodeResponse, many=True)
     return paginate(episodes, params)
