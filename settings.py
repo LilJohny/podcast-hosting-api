@@ -12,6 +12,16 @@ from sqlmodel import SQLModel
 DATABASE_URL = os.getenv('ASYNC_DATABASE_URL')
 Base: DeclarativeMeta = declarative_base()
 ENGINE = create_async_engine(DATABASE_URL)
+BUCKET_NAME = os.getenv("BUCKETEER_BUCKET_NAME")
+AWS_ACCESS_KEY_ID = os.getenv("BUCKETEER_AWS_ACCESS_KEY_ID")
+SECRET_ACCESS_KEY = os.getenv("BUCKETEER_AWS_SECRET_ACCESS_KEY")
+REGION = os.getenv("BUCKETEER_AWS_REGION")
+aws_session = aioboto3.Session(
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=SECRET_ACCESS_KEY,
+    region_name=REGION
+)
+PUBLIC_URL = os.getenv("PUBLIC_URL")
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
@@ -33,7 +43,7 @@ async def get_entity(entity_id: str, entity: Type[SQLModel]):
             return result.first()[0]
 
 
-async def get_entities(entity: Type[SQLModel], conditions: Optional[List[BinaryExpression]]=None):
+async def get_entities(entity: Type[SQLModel], conditions: Optional[List[BinaryExpression]] = None):
     async with async_session_maker() as session:
         async with session.begin():
             query = select(entity)
