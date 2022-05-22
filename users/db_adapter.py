@@ -4,6 +4,7 @@ from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyAccessTokenDatabase,
     SQLAlchemyBaseAccessTokenTable,
 )
+from sqlalchemy import Column, String
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from settings import get_async_session, Base
@@ -12,7 +13,8 @@ from .models import UserDB
 
 
 class UserTable(Base, SQLAlchemyBaseUserTable):
-    pass
+    first_name = Column(String)
+    last_name = Column(String)
 
 
 class AccessTokenTable(SQLAlchemyBaseAccessTokenTable, Base):
