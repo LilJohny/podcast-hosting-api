@@ -22,6 +22,8 @@ aws_session = aioboto3.Session(
     region_name=REGION
 )
 PUBLIC_URL = os.getenv("PUBLIC_URL")
+MAILGUN_API_KEY = os.getenv("MAILGUN_API_KEY")
+MAILGUN_BASE_URL = os.getenv("MAILGUN_BASE_URL")
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
