@@ -1,11 +1,11 @@
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, status, Depends, UploadFile, File, HTTPException
+from fastapi import APIRouter, status, Depends, UploadFile, File
 from fastapi_pagination import Params, paginate, Page
 
 from episodes.models import EpisodeParam, Episode, EpisodeResponse
-from settings import get_entity, save_entity, get_entities
+from shows.db import save_entity, get_entities
 from utils.files import get_s3_key, upload_file_to_s3, FileKind
 from utils.serializers import serialize
 from views import delete_entity, update_entity, read_entity

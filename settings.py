@@ -1,13 +1,10 @@
 import os
-from typing import AsyncGenerator, Type, List, Optional
+from typing import AsyncGenerator
 
 import aioboto3
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql.elements import BinaryExpression
-from sqlmodel import SQLModel
 
 DATABASE_URL = os.getenv('ASYNC_DATABASE_URL')
 Base = declarative_base()
@@ -29,32 +26,6 @@ MAILGUN_BASE_URL = os.getenv("MAILGUN_BASE_URL")
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
-
-
-async def save_entity(entity: SQLModel):
-    async with async_session_maker() as session:
-        async with session.begin():
-            session.add(entity)
-        await session.commit()
-
-
-async def get_entity(entity_id: str, entity: Type[SQLModel]):
-    async with async_session_maker() as session:
-        async with session.begin():
-            result = await session.execute(select(entity).filter_by(id=entity_id, is_removed=False))
-            item = result.first()
-    return item[0] if item else None
-
-
-async def get_entities(entity: Type[SQLModel], conditions: Optional[List[BinaryExpression]] = None):
-    async with async_session_maker() as session:
-        async with session.begin():
-            query = select(entity).filter_by(is_removed=False)
-            if conditions:
-                for condition in conditions:
-                    query = query.where(condition)
-            result = await session.execute(query)
-    return [row[0] for row in result.all()]
 
 
 async_session_maker = sessionmaker(ENGINE, class_=AsyncSession, expire_on_commit=False)
