@@ -5,9 +5,9 @@ from fastapi import APIRouter, status, Depends, UploadFile, File, HTTPException
 from fastapi_pagination import Params, paginate, Page
 
 from episodes.models import EpisodeParam, Episode, EpisodeResponse
-from file_utils import upload_file_to_s3, FileKind, get_s3_key
 from settings import get_entity, save_entity, get_entities
-from utils import serialize
+from utils.files import get_s3_key, upload_file_to_s3, FileKind
+from utils.serializers import serialize
 
 episodes_router = APIRouter(prefix="/episodes")
 

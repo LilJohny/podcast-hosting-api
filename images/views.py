@@ -3,10 +3,10 @@ import uuid
 from fastapi import status, APIRouter, Depends, UploadFile, File, HTTPException
 from fastapi_pagination import paginate, Page, Params
 
-from file_utils import upload_file_to_s3, FileKind, get_s3_key
 from images.models import Image, ImageResponse
 from settings import save_entity, get_entity, get_entities
-from utils import serialize
+from utils.files import get_s3_key, upload_file_to_s3, FileKind
+from utils.serializers import serialize
 
 images_router = APIRouter(prefix="/images")
 

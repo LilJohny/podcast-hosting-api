@@ -9,7 +9,7 @@ from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, I
 from settings import get_entity, save_entity, get_entities
 from shows.models import ShowParam, Show, ShowResponse
 from users import UserDB, current_active_user
-from utils import serialize
+from utils.serializers import serialize
 
 shows_router = APIRouter(prefix="/shows")
 
