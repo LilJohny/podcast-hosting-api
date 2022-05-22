@@ -8,6 +8,7 @@ from episodes.models import EpisodeParam, Episode, EpisodeResponse
 from settings import get_entity, save_entity, get_entities
 from utils.files import get_s3_key, upload_file_to_s3, FileKind
 from utils.serializers import serialize
+from views import delete_entity, update_entity, read_entity
 
 episodes_router = APIRouter(prefix="/episodes")
 
@@ -22,32 +23,18 @@ async def create_episode(episode_param: EpisodeParam, episode_file: UploadFile =
 
 
 @episodes_router.delete("/{episode_id}", status_code=status.HTTP_202_ACCEPTED)
-async def delete_episode(episode_id: str):
-    episode = await get_entity(episode_id, Episode)
-    if not episode:
-        raise HTTPException(status_code=404, detail="Episode not found")
-    episode.is_removed = True
-    await save_entity(episode)
-    return status.HTTP_202_ACCEPTED
+async def delete_episode(episode_id: uuid.UUID):
+    return await delete_entity(episode_id, Episode)
 
 
 @episodes_router.put("/{episode_id}", status_code=status.HTTP_200_OK)
-async def update_episode(episode_id: str, episode_param: EpisodeParam) -> EpisodeResponse:
-    episode = await get_entity(episode_id, Episode)
-    if not episode:
-        raise HTTPException(status_code=404, detail="Episode not found")
-    for key, val in episode_param.dict().items():
-        setattr(episode, key, val)
-    await save_entity(episode)
-    return serialize(episode, EpisodeResponse)
+async def update_episode(episode_id: uuid.UUID, episode_param: EpisodeParam) -> EpisodeResponse:
+    return await update_entity(episode_id, Episode, episode_param, EpisodeResponse)
 
 
 @episodes_router.get("/{episode_id}")
-async def read_episode(episode_id: str) -> EpisodeResponse:
-    episode = await get_entity(episode_id, Episode)
-    if not episode:
-        raise HTTPException(status_code=404, detail="Episode not found")
-    return serialize(episode, EpisodeResponse)
+async def read_episode(episode_id: uuid.UUID) -> EpisodeResponse:
+    return await read_entity(episode_id, Episode, EpisodeResponse)
 
 
 @episodes_router.get("/", response_model=Page[EpisodeResponse])

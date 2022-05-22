@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional
 
-from fastapi import status, APIRouter, Depends, HTTPException
+from fastapi import status, APIRouter, Depends
 from fastapi_pagination import Page, paginate, Params
 
 from images.models import Image
@@ -10,6 +10,7 @@ from settings import get_entity, save_entity, get_entities
 from shows.models import ShowParam, Show, ShowResponse
 from users import UserDB, current_active_user
 from utils.serializers import serialize
+from views import delete_entity, update_entity, read_entity
 
 shows_router = APIRouter(prefix="/shows")
 
@@ -30,32 +31,18 @@ async def create_show(show_param: ShowParam, user: UserDB = Depends(current_acti
 
 @shows_router.delete("/{show_id}")
 async def delete_show(show_id: uuid.UUID):
-    show = await get_entity(str(show_id), Show)
-    if not show:
-        raise HTTPException(status_code=404, detail="Show not found")
-    show.is_removed = True
-    await save_entity(show)
-    return status.HTTP_202_ACCEPTED
+    return await delete_entity(str(show_id), Show)
 
 
 @shows_router.put("/{show_id}")
 async def update_show(show_id: uuid.UUID, show_param: ShowParam) -> ShowResponse:
     show_param.last_build_date = show_param.last_build_date.replace(tzinfo=None)
-    show = await get_entity(str(show_id), Show)
-    if not show:
-        raise HTTPException(status_code=404, detail="Show not found")
-    for key, val in show_param.dict().items():
-        setattr(show, key, val)
-    await save_entity(show)
-    return serialize(show, ShowResponse)
+    return await update_entity(str(show_id), Show, show_param, ShowResponse)
 
 
 @shows_router.get("/{show_id}")
 async def read_show(show_id: uuid.UUID) -> ShowResponse:
-    show = await get_entity(str(show_id), Show)
-    if not show:
-        raise HTTPException(status_code=404, detail="Show not found")
-    return serialize(show, ShowResponse)
+    return await read_entity(show_id, Show, ShowResponse)
 
 
 @shows_router.get("/", response_model=Page[ShowResponse])
