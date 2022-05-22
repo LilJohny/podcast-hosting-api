@@ -4,6 +4,6 @@ forgot_password_mail_template = {
     "data": {
         "from": "Hermes <hermes@amphora.digital>",
         "subject": "You forgot your Amphora password",
-        "text": "You forgot your Amphora password"
+        "text": "You forgot your Amphora password."
     }
 }
