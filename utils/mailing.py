@@ -17,6 +17,6 @@ async def send_email(user_email: str, mail_content) -> int:
 
 def prepare_email(receiver_email: str, token: str, mail_content_template: dict) -> dict:
     mail_content = deepcopy(mail_content_template)
-    mail_content["to"] = receiver_email
+    mail_content["data"]["to"] = receiver_email
     mail_content["data"]["text"] += f"Your reset token is {token}"
     return mail_content
