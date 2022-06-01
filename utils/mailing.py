@@ -5,7 +5,7 @@ import httpx
 from settings import MAILGUN_BASE_URL, MAILGUN_API_KEY
 
 
-async def send_email(mail_content) -> int:
+async def send_email(mail_content: dict) -> int:
     async with httpx.AsyncClient(base_url=MAILGUN_BASE_URL, auth=("api", MAILGUN_API_KEY)) as client:
         request = client.build_request(**mail_content)
         response = await client.send(request)
