@@ -63,6 +63,6 @@ async def list_show(show_name: Optional[str] = None, featured: Optional[bool] = 
 
 @shows_router.get("/my/all", response_model=Page[ShowResponse])
 async def list_my_shows(params: Params = Depends(), user: UserDB = Depends(current_active_user)):
-    shows = await get_entities(Show, [(Show.podcast_owner == str(user.id))])
+    shows = await get_entities(Show, [(Show.owner == str(user.id))])
     shows = serialize(shows, ShowResponse, many=True)
     return paginate(shows, params)
