@@ -4,6 +4,7 @@ from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyAccessTokenDatabase,
     SQLAlchemyBaseAccessTokenTable,
 )
+from sqladmin import ModelAdmin
 from sqlalchemy import Column, String
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +16,11 @@ from .models import UserDB
 class UserTable(Base, SQLAlchemyBaseUserTable):
     first_name = Column(String)
     last_name = Column(String)
+
+
+class UserAdmin(ModelAdmin, model=UserTable):
+    column_list = [UserTable.id, UserTable.first_name, UserTable.last_name, UserTable.email, UserTable.is_active,
+                   UserTable.is_superuser, UserTable.is_verified]
 
 
 class AccessTokenTable(SQLAlchemyBaseAccessTokenTable, Base):

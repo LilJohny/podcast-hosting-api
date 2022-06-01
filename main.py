@@ -1,12 +1,24 @@
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from sqladmin import Admin
 
 from episodes import episodes_router
-from images import images_router
+from episodes.models import EpisodeAdmin
+from images.models import ImageAdmin
+from settings import ENGINE
 from shows import shows_router
+from shows.models import ShowAdmin
 from users import auth_backend, UserDB, fastapi_users, current_active_user
-from fastapi.middleware.cors import CORSMiddleware
+from users.db_adapter import UserAdmin
 
 app = FastAPI()
+
+admin = Admin(app, ENGINE)
+
+admin.register_model(UserAdmin)
+admin.register_model(ImageAdmin)
+admin.register_model(ShowAdmin)
+admin.register_model(EpisodeAdmin)
 
 origins = ['*']
 
@@ -17,7 +29,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
@@ -35,7 +46,7 @@ app.include_router(
 )
 app.include_router(fastapi_users.get_users_router(), prefix="/users", tags=["users"])
 app.include_router(shows_router, tags=["shows"])
-app.include_router(images_router, tags=["images"])
+# app.include_router(images_router, tags=["images"])
 app.include_router(episodes_router, tags=["episodes"])
 
 

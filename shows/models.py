@@ -4,7 +4,7 @@ import uuid
 import uuid as uuid_lib
 from typing import Set
 
-from pydantic import AnyUrl
+from sqladmin import ModelAdmin
 from sqlmodel import SQLModel, Field, Enum, Column, String, ARRAY
 
 from models import DeletableModel, UUIDModel
@@ -45,3 +45,23 @@ class ShowResponse(ShowParam, UUIDModel):
 
 class Show(ShowResponse, DeletableModel, table=True):
     pass
+
+
+class ShowAdmin(ModelAdmin, model=Show):
+    column_list = [Show.language,
+                   Show.category,
+                   Show.series,
+                   Show.is_removed,
+                   Show.id,
+                   Show.title,
+                   Show.description,
+                   Show.show_copyright,
+                   Show.show_link,
+                   Show.media_link,
+                   Show.generator,
+                   Show.featured,
+                   Show.image,
+                   Show.is_locked,
+                   Show.owner,
+                   Show.last_build_date,
+                   Show.feed_file_link]
