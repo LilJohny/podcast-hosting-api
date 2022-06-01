@@ -6,7 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = os.getenv('ASYNC_DATABASE_URL')
+DATABASE_URL = os.getenv('DATABASE_URL')
+DATABASE_URL = DATABASE_URL.replace('postgres', 'postgresql+asyncpg')
 Base = declarative_base()
 ENGINE = create_async_engine(DATABASE_URL)
 BUCKET_NAME = os.getenv("BUCKETEER_BUCKET_NAME")
