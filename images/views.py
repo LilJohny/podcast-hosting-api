@@ -16,7 +16,7 @@ images_router = APIRouter(prefix="/images")
 async def create_image(image_title: str, image_file: UploadFile = File(...)) -> ImageResponse:
     s3_key = get_s3_key(image_file.filename, image_title)
     image_url = await upload_file_to_s3(s3_key, image_file.file, FileKind.IMAGE)
-    image = Image(title=image_title, file_url=image_url, is_removed=False)
+    image = Image(title=image_title, file_url=image_url)
     await save_entity(image)
     return serialize(image, ImageResponse)
 

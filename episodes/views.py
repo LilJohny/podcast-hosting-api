@@ -17,7 +17,7 @@ episodes_router = APIRouter(prefix="/episodes")
 async def create_episode(episode_param: EpisodeParam, episode_file: UploadFile = File(...)) -> EpisodeResponse:
     s3_key = get_s3_key(episode_file.filename, episode_param.title)
     episode_link = await upload_file_to_s3(s3_key, episode_file.file, FileKind.AUDIO)
-    episode = Episode(**episode_param.dict(), file_link=episode_link, episode_link="", is_removed=False)
+    episode = Episode(**episode_param.dict(), file_link=episode_link, episode_link="")
     await save_entity(episode)
     return serialize(episode, EpisodeResponse)
 

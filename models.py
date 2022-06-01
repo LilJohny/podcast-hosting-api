@@ -4,7 +4,7 @@ from sqlmodel import SQLModel, Field
 
 
 class DeletableModel(SQLModel):
-    is_removed: bool
+    is_removed: bool = Field(default=False)
 
 
 def str_uuid_factory():

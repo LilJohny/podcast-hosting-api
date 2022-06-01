@@ -24,7 +24,7 @@ async def create_show(show_create_param: ShowCreate, image_title: str, user: Use
     show_create_param.last_build_date = show_create_param.last_build_date.replace(tzinfo=None)
     feed_file_link = "/".join([show_create_param.title, "feed.xml"])
     show = Show(**show_create_param.dict(), image=image.id, show_link="", media_link=" ",
-                feed_file_link=feed_file_link, is_removed=False)
+                feed_file_link=feed_file_link)
     image_data = await get_view_entity(show.image, Image)
     image = ImageDTO(title=image_data.title, url=image_data.file_url, height=100, width=100, link='')
     rss_feed = generate_new_show_rss_feed(show.title, '', '', show.description, 'LilJohny generator', show.language,
