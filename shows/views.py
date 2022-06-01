@@ -10,7 +10,7 @@ from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, I
 from shows.db import save_entity, get_entities
 from shows.models import ShowParam, Show, ShowResponse, ShowCreate
 from users import UserDB, current_active_user
-from utils.files import upload_file_to_s3, FileKind, get_s3_key
+from utils.rss import start_serving_rss_feed
 from utils.serializers import serialize
 from views import delete_entity, update_entity, read_entity, get_view_entity
 
@@ -22,14 +22,15 @@ async def create_show(show_create_param: ShowCreate, image_title: str, user: Use
                       image_file: UploadFile = File(...)) -> ShowResponse:
     image = await create_image(image_title, image_file)
     show_create_param.last_build_date = show_create_param.last_build_date.replace(tzinfo=None)
+    feed_file_link = "/".join([show_create_param.title, "feed.xml"])
     show = Show(**show_create_param.dict(), image=image.id, show_link="", media_link=" ",
-                feed_file_link="feed.xml", is_removed=False)
+                feed_file_link=feed_file_link, is_removed=False)
     image_data = await get_view_entity(show.image, Image)
     image = ImageDTO(title=image_data.title, url=image_data.file_url, height=100, width=100, link='')
     rss_feed = generate_new_show_rss_feed(show.title, '', '', show.description, 'LilJohny generator', show.language,
                                           show.show_copyright, show.last_build_date, image,
                                           PodcastOwnerDTO(name=user.email, email=user.email))
-    print(rss_feed)
+    start_serving_rss_feed(rss_feed, feed_file_link)
     await save_entity(show)
     return serialize(show, ShowResponse)
 
