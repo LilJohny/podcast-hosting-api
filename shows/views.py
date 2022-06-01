@@ -39,7 +39,7 @@ async def create_show(show_create_param: ShowCreate,
                 feed_file_link=feed_file_link)
 
     image = ImageDTO(title=image.title, url=image.file_url, height=100, width=100, link='')
-    rss_feed = generate_new_show_rss_feed(show.title, '', '', show.description, 'LilJohny generator', show.language,
+    rss_feed = generate_new_show_rss_feed(show.title, '', '', show.description, GENERATOR_VERSION, show.language,
                                           show.show_copyright, show.last_build_date, image,
                                           PodcastOwnerDTO(name=user.email, email=user.email))
     start_serving_rss_feed(rss_feed, feed_file_link)
