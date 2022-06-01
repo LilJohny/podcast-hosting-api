@@ -22,12 +22,10 @@ class Category(str, enum.Enum):
 class ShowCreate(SQLModel):
     title: str
     description: str
-    generator: str
     language: Language = Field(sa_column=Column(Enum(Language)))
     show_copyright: str
     category: Category = Field(sa_column=Column(Enum(Category)))
     series: Set[str] = Field(default=None, sa_column=Column(ARRAY(String())))
-    featured: bool = Field(default=False)
 
 
 class ShowParam(ShowCreate):
@@ -36,6 +34,8 @@ class ShowParam(ShowCreate):
 
 
 class ShowResponse(ShowParam, UUIDModel):
+    generator: str
+    featured: bool = Field(default=False)
     image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
     is_locked: bool
     owner: uuid.UUID = Field(default=None, foreign_key=UserTable.id)
