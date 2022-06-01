@@ -24,8 +24,8 @@ class EpisodeParam(SQLModel):
 
 
 class EpisodeResponse(EpisodeParam, UUIDModel):
-    file_link: HttpUrl
-    episode_link: HttpUrl
+    file_link: str
+    episode_link: str
     episode_guid: str
     pub_date: datetime.datetime
     duration: int

@@ -1,22 +1,47 @@
+import datetime
+import os
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, status, Depends, UploadFile, File
+from fastapi import APIRouter, status, Depends, UploadFile, File, HTTPException
 from fastapi_pagination import Params, paginate, Page
 
 from episodes.models import EpisodeParam, Episode, EpisodeResponse
+from images.views import create_image
+from models import str_uuid_factory
 from shows.db import save_entity, get_entities
+from utils.audio import DURATION_FINDERS
 from utils.files import upload_file_to_s3, FileKind
 from utils.serializers import serialize
 from views import delete_entity, update_entity, read_entity
+from fastapi.exceptions import ValidationError
 
 episodes_router = APIRouter(prefix="/episodes")
 
 
 @episodes_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_episode(episode_param: EpisodeParam, episode_file: UploadFile = File(...)) -> EpisodeResponse:
-    episode_link = await upload_file_to_s3(episode_file.filename, episode_param.title, episode_file.file, FileKind.AUDIO)
-    episode = Episode(**episode_param.dict(), file_link=episode_link, episode_link="")
+async def create_episode(episode_param: EpisodeParam,
+                         image_title: str,
+                         episode_file: UploadFile = File(...),
+                         image_file: UploadFile = File(...)) -> EpisodeResponse:
+    image = await create_image(image_title, image_file)
+    episode_link = await upload_file_to_s3(episode_file.filename, episode_param.title, episode_file.file,
+                                           FileKind.AUDIO)
+    episode_id = str_uuid_factory()
+    _, file_extension = os.path.splitext(episode_file.filename)
+    duration_finder = DURATION_FINDERS.get(file_extension)
+    if duration_finder is None:
+        raise HTTPException(status_code=400, detail="Amphora supports only .mp3 and .wave audio formats")
+    episode_duration = duration_finder(episode_file.file)
+    episode = Episode(**episode_param.dict(),
+                      id=episode_id,
+                      file_link=episode_link,
+                      episode_link=f"/episode_id",
+                      cover_image=image.id,
+                      episode_guid=str_uuid_factory(),
+                      pub_date=datetime.datetime.utcnow().replace(tzinfo=None),
+                      duration=episode_duration
+                      )
     await save_entity(episode)
     return serialize(episode, EpisodeResponse)
 
