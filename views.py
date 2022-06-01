@@ -3,7 +3,7 @@ import uuid
 from fastapi import HTTPException
 from starlette import status
 
-from shows.db import get_entity, save_entity
+from utils.db import get_entity, save_entity
 from utils.serializers import serialize
 
 

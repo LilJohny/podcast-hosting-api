@@ -4,7 +4,7 @@ from fastapi import status, APIRouter, Depends, UploadFile, File
 from fastapi_pagination import paginate, Page, Params
 
 from images.models import Image, ImageResponse
-from shows.db import save_entity, get_entities
+from utils.db import save_entity, get_entities
 from utils.files import upload_file_to_s3, FileKind
 from utils.serializers import serialize
 from views import delete_entity, read_entity

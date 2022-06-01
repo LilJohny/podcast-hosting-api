@@ -8,7 +8,7 @@ from fastapi_pagination import Page, paginate, Params
 from images.views import create_image
 from models import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
-from shows.db import save_entity, get_entities
+from utils.db import save_entity, get_entities
 from shows.models import ShowParam, Show, ShowResponse, ShowCreate
 from users import UserDB, current_active_user
 from utils.constants import GENERATOR_VERSION
