@@ -18,3 +18,4 @@ verify_user_mail_template = {
                 "You account is already now, but you need to verify it via token. "
     }
 }
+GENERATOR_VERSION = "Amphora v1.0"

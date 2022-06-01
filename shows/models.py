@@ -37,10 +37,11 @@ class ShowResponse(ShowParam, UUIDModel):
     generator: str
     featured: bool = Field(default=False)
     image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
-    is_locked: bool
+    is_locked: bool = Field(default=True)
     owner: uuid.UUID = Field(default=None, foreign_key=UserTable.id)
     last_build_date: datetime.datetime
+    feed_file_link: str
 
 
 class Show(ShowResponse, DeletableModel, table=True):
-    feed_file_link: str
+    pass

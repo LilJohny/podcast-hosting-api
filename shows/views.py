@@ -1,32 +1,44 @@
+import datetime
 import uuid
 from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File
 from fastapi_pagination import Page, paginate, Params
 
-from images.models import Image
 from images.views import create_image
+from models import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
 from shows.db import save_entity, get_entities
 from shows.models import ShowParam, Show, ShowResponse, ShowCreate
 from users import UserDB, current_active_user
+from utils.constants import GENERATOR_VERSION
 from utils.rss import start_serving_rss_feed
 from utils.serializers import serialize
-from views import delete_entity, update_entity, read_entity, get_view_entity
+from views import delete_entity, update_entity, read_entity
 
 shows_router = APIRouter(prefix="/shows")
 
 
 @shows_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_show(show_create_param: ShowCreate, image_title: str, user: UserDB = Depends(current_active_user),
-                      image_file: UploadFile = File(...)) -> ShowResponse:
+async def create_show(show_create_param: ShowCreate,
+                      image_title: str,
+                      image_file: UploadFile = File(...),
+                      user: UserDB = Depends(current_active_user)) -> ShowResponse:
     image = await create_image(image_title, image_file)
-    show_create_param.last_build_date = show_create_param.last_build_date.replace(tzinfo=None)
     feed_file_link = "/".join([show_create_param.title, "feed.xml"])
-    show = Show(**show_create_param.dict(), image=image.id, show_link="", media_link=" ",
+    show_id = str_uuid_factory()
+    show_link = "/".join([show_id, show_create_param.title])
+    show = Show(**show_create_param.dict(),
+                id=show_id,
+                image=image.id,
+                show_link=show_link,
+                media_link=image.file_url,
+                last_build_date=datetime.datetime.utcnow().replace(tzinfo=None),
+                generator=GENERATOR_VERSION,
+                owner=user.id,
                 feed_file_link=feed_file_link)
-    image_data = await get_view_entity(show.image, Image)
-    image = ImageDTO(title=image_data.title, url=image_data.file_url, height=100, width=100, link='')
+
+    image = ImageDTO(title=image.title, url=image.file_url, height=100, width=100, link='')
     rss_feed = generate_new_show_rss_feed(show.title, '', '', show.description, 'LilJohny generator', show.language,
                                           show.show_copyright, show.last_build_date, image,
                                           PodcastOwnerDTO(name=user.email, email=user.email))
