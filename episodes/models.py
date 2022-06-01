@@ -15,13 +15,9 @@ class EpisodeType(str, enum.Enum):
 class EpisodeParam(SQLModel):
     title: str
     description: str
-    cover_image_link: HttpUrl
-    episode_guid: str
     episode_num: int
     season_num: int
     explicit: bool
-    pub_date: datetime.datetime
-    duration: int
     episode_type: EpisodeType = Field(sa_column=Column(Enum(EpisodeType)))
     show_id: uuid_lib.UUID = Field(default=None, foreign_key="show.id")
     series: str = Field(default=None, nullable=True)
@@ -30,7 +26,9 @@ class EpisodeParam(SQLModel):
 class EpisodeResponse(EpisodeParam, UUIDModel):
     file_link: HttpUrl
     episode_link: HttpUrl
-
+    episode_guid: str
+    pub_date: datetime.datetime
+    duration: int
 
 class Episode(EpisodeResponse, DeletableModel, table=True):
-    pass
+    cover_image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
