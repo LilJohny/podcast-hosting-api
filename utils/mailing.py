@@ -16,5 +16,5 @@ async def send_email(mail_content) -> int:
 def prepare_email(receiver_email: str, token: str, mail_content_template: dict) -> dict:
     mail_content = deepcopy(mail_content_template)
     mail_content["data"]["to"] = receiver_email
-    mail_content["data"]["text"] += f"Use this token {token} to complete."
+    mail_content["data"]["text"] += f"Use following token to complete: \n\n {token}"
     return mail_content
