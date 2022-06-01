@@ -30,5 +30,6 @@ class EpisodeResponse(EpisodeParam, UUIDModel):
     pub_date: datetime.datetime
     duration: int
 
+
 class Episode(EpisodeResponse, DeletableModel, table=True):
     cover_image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
