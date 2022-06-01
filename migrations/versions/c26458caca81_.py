@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: b482a0088417
+Revision ID: c26458caca81
 Revises: 
-Create Date: 2022-05-22 18:41:58.226660
+Create Date: 2022-05-29 13:34:19.751972
 
 """
 from alembic import op
@@ -12,7 +12,7 @@ import fastapi_users_db_sqlalchemy
 
 
 # revision identifiers, used by Alembic.
-revision = 'b482a0088417'
+revision = 'c26458caca81'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -45,7 +45,7 @@ def upgrade():
     sa.Column('show_copyright', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('last_build_date', sa.DateTime(), nullable=False),
     sa.Column('image', sqlmodel.sql.sqltypes.GUID(), nullable=True),
-    sa.Column('podcast_owner', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('owner', sqlmodel.sql.sqltypes.GUID(), nullable=False),
     sa.Column('is_locked', sa.Boolean(), nullable=False),
     sa.Column('featured', sa.Boolean(), nullable=True),
     sa.Column('feed_file_link', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
@@ -62,7 +62,7 @@ def upgrade():
     op.create_index(op.f('ix_show_is_removed'), 'show', ['is_removed'], unique=False)
     op.create_index(op.f('ix_show_last_build_date'), 'show', ['last_build_date'], unique=False)
     op.create_index(op.f('ix_show_media_link'), 'show', ['media_link'], unique=False)
-    op.create_index(op.f('ix_show_podcast_owner'), 'show', ['podcast_owner'], unique=False)
+    op.create_index(op.f('ix_show_owner'), 'show', ['owner'], unique=False)
     op.create_index(op.f('ix_show_show_copyright'), 'show', ['show_copyright'], unique=False)
     op.create_index(op.f('ix_show_show_link'), 'show', ['show_link'], unique=False)
     op.create_index(op.f('ix_show_title'), 'show', ['title'], unique=False)
@@ -108,6 +108,8 @@ def upgrade():
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('is_superuser', sa.Boolean(), nullable=False),
     sa.Column('is_verified', sa.Boolean(), nullable=False),
+    sa.Column('first_name', sa.String(), nullable=True),
+    sa.Column('last_name', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
@@ -147,7 +149,7 @@ def downgrade():
     op.drop_index(op.f('ix_show_title'), table_name='show')
     op.drop_index(op.f('ix_show_show_link'), table_name='show')
     op.drop_index(op.f('ix_show_show_copyright'), table_name='show')
-    op.drop_index(op.f('ix_show_podcast_owner'), table_name='show')
+    op.drop_index(op.f('ix_show_owner'), table_name='show')
     op.drop_index(op.f('ix_show_media_link'), table_name='show')
     op.drop_index(op.f('ix_show_last_build_date'), table_name='show')
     op.drop_index(op.f('ix_show_is_removed'), table_name='show')
