@@ -24,7 +24,7 @@ MAILGUN_API_KEY = os.getenv("MAILGUN_API_KEY")
 MAILGUN_BASE_URL = os.getenv("MAILGUN_BASE_URL")
 SSH_PUBLIC_KEY = os.getenv("SSH_PUBLIC_KEY")
 SSH_PRIVATE_KEY = os.getenv("SSH_PRIVATE_KEY")
-
+USER_MANAGER_SECRET = os.getenv("USER_MANAGER_SECRET")
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
