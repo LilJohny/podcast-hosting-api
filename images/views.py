@@ -5,7 +5,7 @@ from fastapi_pagination import paginate, Page, Params
 
 from images.models import Image, ImageResponse
 from shows.db import save_entity, get_entities
-from utils.files import get_s3_key, upload_file_to_s3, FileKind
+from utils.files import upload_file_to_s3, FileKind
 from utils.serializers import serialize
 from views import delete_entity, read_entity
 
@@ -14,8 +14,7 @@ images_router = APIRouter(prefix="/images")
 
 @images_router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_image(image_title: str, image_file: UploadFile = File(...)) -> ImageResponse:
-    s3_key = get_s3_key(image_file.filename, image_title)
-    image_url = await upload_file_to_s3(s3_key, image_file.file, FileKind.IMAGE)
+    image_url = await upload_file_to_s3(image_file.filename, image_title, image_file.file, FileKind.IMAGE)
     image = Image(title=image_title, file_url=image_url)
     await save_entity(image)
     return serialize(image, ImageResponse)

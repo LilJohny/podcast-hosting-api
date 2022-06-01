@@ -15,8 +15,9 @@ def get_s3_key(file_name: str, title: str) -> str:
     return s3_key
 
 
-async def upload_file_to_s3(file_name, file_data, file_kind: FileKind) -> str:
-    blob_s3_key = f"{file_kind.value}/{file_name}"
+async def upload_file_to_s3(file_name: str, file_title: str, file_data, file_kind: FileKind) -> str:
+    file_key = get_s3_key(file_name, file_title)
+    blob_s3_key = f"{file_kind.value}/{file_key}"
     async with aws_session.client("s3") as s3:
         try:
             response = await s3.upload_fileobj(file_data, BUCKET_NAME, blob_s3_key)
