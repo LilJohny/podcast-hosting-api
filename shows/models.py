@@ -25,9 +25,6 @@ class ShowCreate(SQLModel):
     generator: str
     language: Language = Field(sa_column=Column(Enum(Language)))
     show_copyright: str
-    last_build_date: datetime.datetime
-    owner: uuid.UUID = Field(default=None, foreign_key=UserTable.id)
-    is_locked: bool
     category: Category = Field(sa_column=Column(Enum(Category)))
     series: Set[str] = Field(default=None, sa_column=Column(ARRAY(String())))
     featured: bool = Field(default=False)
@@ -40,7 +37,12 @@ class ShowParam(ShowCreate):
 
 class ShowResponse(ShowParam, UUIDModel):
     image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
+    is_locked: bool
+    owner: uuid.UUID = Field(default=None, foreign_key=UserTable.id)
+    last_build_date: datetime.datetime
 
 
 class Show(ShowResponse, DeletableModel, table=True):
     feed_file_link: str
+
+
