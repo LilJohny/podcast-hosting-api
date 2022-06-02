@@ -46,6 +46,7 @@ async def create_show(show_create_param: ShowCreate,
     await save_entity(show)
     return serialize(show, ShowResponse)
 
+
 @shows_router.get("/my", response_model=Page[ShowResponse])
 async def list_my_shows(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends(),
                         user: UserDB = Depends(current_active_user)):
@@ -56,6 +57,7 @@ async def list_my_shows(show_name: Optional[str] = None, featured: Optional[bool
     shows = await get_entities(Show, conditions)
     shows = serialize(shows, ShowResponse, many=True)
     return paginate(shows, params)
+
 
 @shows_router.delete("/{show_id}")
 async def delete_show(show_id: uuid.UUID):

@@ -1,8 +1,9 @@
 from typing import Type, Optional, List
 
 from sqlalchemy.future import select
-from sqlmodel import SQLModel
 from sqlalchemy.sql.elements import BinaryExpression
+from sqlmodel import SQLModel
+
 from settings import async_session_maker
 
 

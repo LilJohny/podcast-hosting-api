@@ -37,7 +37,7 @@ def generate_new_show_rss_feed(show_title: str,
                      episode_type=EpisodeType.FULL,
                      pub_date=datetime.datetime.today())
 
-    rss_items = [ ep]
+    rss_items = [ep]
 
     last_build_date_str = datetime_to_str(last_build_date)
     show_title = cdata_wrap(show_title)

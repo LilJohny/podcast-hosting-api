@@ -14,5 +14,3 @@ DURATION_FINDERS = {
     "mp3": determine_mp3,
     "wave": determine_wave
 }
-
-
