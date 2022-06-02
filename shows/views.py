@@ -8,10 +8,10 @@ from fastapi_pagination import Page, paginate, Params
 from images.views import create_image
 from models import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
-from utils.db import save_entity, get_entities
 from shows.models import ShowUpdate, Show, ShowResponse, ShowCreate
 from users import UserDB, current_active_user
 from utils.constants import GENERATOR_VERSION
+from utils.db import save_entity, get_entities
 from utils.rss import start_serving_rss_feed
 from utils.serializers import serialize
 from views import delete_entity, update_entity, read_entity
@@ -46,6 +46,16 @@ async def create_show(show_create_param: ShowCreate,
     await save_entity(show)
     return serialize(show, ShowResponse)
 
+@shows_router.get("/my", response_model=Page[ShowResponse])
+async def list_my_shows(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends(),
+                        user: UserDB = Depends(current_active_user)):
+    conditions = [(model_field == field_val) for model_field, field_val in [(Show.title, show_name),
+                                                                            (Show.featured, featured),
+                                                                            (Show.owner, user.id)
+                                                                            ] if field_val is not None]
+    shows = await get_entities(Show, conditions)
+    shows = serialize(shows, ShowResponse, many=True)
+    return paginate(shows, params)
 
 @shows_router.delete("/{show_id}")
 async def delete_show(show_id: uuid.UUID):
@@ -69,12 +79,5 @@ async def list_show(show_name: Optional[str] = None, featured: Optional[bool] = 
                                                                             (Show.featured, featured)
                                                                             ] if field_val is not None]
     shows = await get_entities(Show, conditions)
-    shows = serialize(shows, ShowResponse, many=True)
-    return paginate(shows, params)
-
-
-@shows_router.get("/my/all", response_model=Page[ShowResponse])
-async def list_my_shows(params: Params = Depends(), user: UserDB = Depends(current_active_user)):
-    shows = await get_entities(Show, [(Show.owner == str(user.id))])
     shows = serialize(shows, ShowResponse, many=True)
     return paginate(shows, params)
