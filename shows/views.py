@@ -9,7 +9,7 @@ from images.views import create_image
 from models import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
 from utils.db import save_entity, get_entities
-from shows.models import ShowParam, Show, ShowResponse, ShowCreate
+from shows.models import ShowUpdate, Show, ShowResponse, ShowCreate
 from users import UserDB, current_active_user
 from utils.constants import GENERATOR_VERSION
 from utils.rss import start_serving_rss_feed
@@ -53,7 +53,7 @@ async def delete_show(show_id: uuid.UUID):
 
 
 @shows_router.put("/{show_id}")
-async def update_show(show_id: uuid.UUID, show_param: ShowParam) -> ShowResponse:
+async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowResponse:
     show_param.last_build_date = show_param.last_build_date.replace(tzinfo=None)
     return await update_entity(show_id, Show, show_param, ShowResponse)
 

@@ -28,12 +28,13 @@ class ShowCreate(SQLModel):
     series: Set[str] = Field(default=None, sa_column=Column(ARRAY(String())))
 
 
-class ShowParam(ShowCreate):
+class ShowUpdate(ShowCreate):
+    pass
+
+
+class ShowResponse(ShowUpdate, UUIDModel):
     show_link: str
     media_link: str
-
-
-class ShowResponse(ShowParam, UUIDModel):
     generator: str
     featured: bool = Field(default=False)
     image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
