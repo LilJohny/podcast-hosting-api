@@ -9,9 +9,9 @@ from images.views import create_image
 from models import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
 from shows.models import ShowUpdate, Show, ShowResponse, ShowCreate
-from users import UserDB, current_active_user
+from users import User, current_active_user
 from utils.constants import GENERATOR_VERSION
-from utils.db import save_entity, get_entities, get_entity
+from utils.db import save_entity, get_entities
 from utils.files import upload_file_to_s3, FileKind
 from utils.serializers import serialize
 from views import delete_entity, update_entity, read_entity
@@ -23,9 +23,8 @@ shows_router = APIRouter(prefix="/shows")
 async def create_show(show_create_param: ShowCreate,
                       image_title: str,
                       image_file: UploadFile = File(...),
-                      user: UserDB = Depends(current_active_user)) -> ShowResponse:
+                      user: User = Depends(current_active_user)) -> ShowResponse:
     image = await create_image(image_title, image_file)
-    feed_file_link = "/".join([show_create_param.title, "feed.xml"])
     show_id = str_uuid_factory()
     show_link = "/".join([show_id, show_create_param.title])
     image_dto = ImageDTO(title=image.title, url=image.file_url, height=100, width=100, link='')
