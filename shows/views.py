@@ -11,8 +11,8 @@ from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, I
 from shows.models import ShowUpdate, Show, ShowResponse, ShowCreate
 from users import UserDB, current_active_user
 from utils.constants import GENERATOR_VERSION
-from utils.db import save_entity, get_entities
-from utils.rss import start_serving_rss_feed
+from utils.db import save_entity, get_entities, get_entity
+from utils.files import upload_file_to_s3, FileKind
 from utils.serializers import serialize
 from views import delete_entity, update_entity, read_entity
 
@@ -28,6 +28,20 @@ async def create_show(show_create_param: ShowCreate,
     feed_file_link = "/".join([show_create_param.title, "feed.xml"])
     show_id = str_uuid_factory()
     show_link = "/".join([show_id, show_create_param.title])
+    image_dto = ImageDTO(title=image.title, url=image.file_url, height=100, width=100, link='')
+    rss_feed = generate_new_show_rss_feed(show_create_param.title,
+                                          '',
+                                          '',
+                                          show_create_param.description,
+                                          GENERATOR_VERSION,
+                                          show_create_param.language,
+                                          show_create_param.show_copyright,
+                                          datetime.datetime.utcnow().replace(
+                                            tzinfo=None
+                                          ),
+                                          image_dto,
+                                          PodcastOwnerDTO(name=user.email, email=user.email))
+    feed_file_link = await upload_file_to_s3(f"{show_id.replace('-','')}.xml", rss_feed.decode('utf-8'), FileKind.XML)
     show = Show(**show_create_param.dict(),
                 id=show_id,
                 image=image.id,
@@ -37,12 +51,6 @@ async def create_show(show_create_param: ShowCreate,
                 generator=GENERATOR_VERSION,
                 owner=user.id,
                 feed_file_link=feed_file_link)
-
-    image = ImageDTO(title=image.title, url=image.file_url, height=100, width=100, link='')
-    rss_feed = generate_new_show_rss_feed(show.title, '', '', show.description, GENERATOR_VERSION, show.language,
-                                          show.show_copyright, show.last_build_date, image,
-                                          PodcastOwnerDTO(name=user.email, email=user.email))
-    start_serving_rss_feed(rss_feed, feed_file_link)
     await save_entity(show)
     return serialize(show, ShowResponse)
 
