@@ -8,7 +8,8 @@ from sqladmin import ModelAdmin
 from sqlmodel import SQLModel, Field, Enum, Column, String, ARRAY
 
 from models import DeletableModel, UUIDModel
-from users.db_adapter import UserTable
+
+from users.db import User
 
 
 class Language(str, enum.Enum):
@@ -39,7 +40,7 @@ class ShowResponse(ShowUpdate, UUIDModel):
     featured: bool = Field(default=False)
     image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
     is_locked: bool = Field(default=True)
-    owner: uuid.UUID = Field(default=None, foreign_key=UserTable.id)
+    owner: uuid.UUID = Field(default=None, foreign_key=User.id)
     last_build_date: datetime.datetime
     feed_file_link: str
 
