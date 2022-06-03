@@ -26,7 +26,6 @@ from episodes.models import Episode
 from images.models import Image
 from shows.models import Show
 
-
 target_metadata = SQLModel.metadata, Base.metadata
 
 

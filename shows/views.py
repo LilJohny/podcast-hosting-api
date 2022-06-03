@@ -36,11 +36,11 @@ async def create_show(show_create_param: ShowCreate,
                                           show_create_param.language,
                                           show_create_param.show_copyright,
                                           datetime.datetime.utcnow().replace(
-                                            tzinfo=None
+                                              tzinfo=None
                                           ),
                                           image_dto,
                                           PodcastOwnerDTO(name=user.email, email=user.email))
-    feed_file_link = await upload_file_to_s3(f"{show_id.replace('-','')}.xml", rss_feed.decode('utf-8'), FileKind.XML)
+    feed_file_link = await upload_file_to_s3(f"{show_id.replace('-', '')}.xml", rss_feed.decode('utf-8'), FileKind.XML)
     show = Show(**show_create_param.dict(),
                 id=show_id,
                 image=image.id,
