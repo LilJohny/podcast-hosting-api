@@ -53,7 +53,7 @@ s3transfer==0.5.2
 six==1.16.0
 sniffio==1.2.0
 sqladmin==0.1.9
-SQLAlchemy<=1.4.34
+SQLAlchemy==1.4.37
 sqlalchemy2-stubs==0.0.2a22
 sqlmodel==0.0.4
 starlette==0.17.1
