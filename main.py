@@ -10,7 +10,7 @@ from shows import shows_router
 from shows.models import ShowAdmin
 from users import auth_backend, UserDB, fastapi_users, current_active_user
 from users.db_adapter import UserAdmin
-
+from utils.rss import rss_router
 app = FastAPI()
 
 admin = Admin(app, ENGINE)
@@ -48,7 +48,7 @@ app.include_router(fastapi_users.get_users_router(), prefix="/users", tags=["use
 app.include_router(shows_router, tags=["shows"])
 # app.include_router(images_router, tags=["images"])
 app.include_router(episodes_router, tags=["episodes"])
-
+app.include_router(rss_router)
 
 @app.get("/")
 async def root():
