@@ -64,6 +64,7 @@ def generate_new_show_rss_feed(show_title: str,
     el.set(XML_LANG, "en")
     with open(RSS_FILENAME, "wb") as f:
         f.write(el_to_str(el, add_xml_header=True))
+    return el_to_str(el, add_xml_header=True)
 
 
 if __name__ == '__main__':
