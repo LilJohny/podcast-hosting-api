@@ -13,6 +13,8 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 
 from settings import USER_MANAGER_SECRET
 from users.db import User, get_user_db
+from utils.constants import verify_user_mail_template, forgot_password_mail_template
+from utils.mailing import prepare_email, send_email
 
 SECRET = USER_MANAGER_SECRET
 
@@ -27,11 +29,15 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     async def on_after_forgot_password(
         self, user: User, token: str, request: Optional[Request] = None
     ):
+        forgot_password_mail = prepare_email(user.email, token, forgot_password_mail_template)
+        await send_email(forgot_password_mail)
         print(f"User {user.id} has forgot their password. Reset token: {token}")
 
     async def on_after_request_verify(
         self, user: User, token: str, request: Optional[Request] = None
     ):
+        verify_user_mail = prepare_email(user.email, token, verify_user_mail_template)
+        await send_email(verify_user_mail)
         print(f"Verification requested for user {user.id}. Verification token: {token}")
 
 
