@@ -4,6 +4,7 @@ from sqladmin import Admin
 
 from episodes import episodes_router
 from episodes.models import EpisodeAdmin
+from images import images_router
 from images.models import ImageAdmin
 from settings import ENGINE
 from shows import shows_router
@@ -54,7 +55,7 @@ app.include_router(
     tags=["users"],
 )
 app.include_router(shows_router, tags=["shows"])
-# app.include_router(images_router, tags=["images"])
+app.include_router(images_router, tags=["images"])
 app.include_router(episodes_router, tags=["episodes"])
 app.include_router(rss_router)
 
