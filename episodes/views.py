@@ -11,7 +11,7 @@ from images.views import create_image
 from models import str_uuid_factory
 from utils.audio import DURATION_FINDERS
 from utils.db import save_entity, get_entities
-from utils.files import upload_file_to_s3, FileKind
+from utils.files import upload_file_to_s3, FileKind, get_s3_key
 from utils.serializers import serialize
 from views import delete_entity, update_entity, read_entity
 
@@ -24,7 +24,8 @@ async def create_episode(episode_param: EpisodeParam,
                          episode_file: UploadFile = File(...),
                          image_file: UploadFile = File(...)) -> EpisodeResponse:
     image = await create_image(image_title, image_file)
-    episode_link = await upload_file_to_s3(episode_file.filename, episode_param.title, episode_file.file,
+    image_s3_key = get_s3_key(episode_file.filename, episode_param.title)
+    episode_link = await upload_file_to_s3(image_s3_key, episode_file.file.read(),
                                            FileKind.AUDIO)
     episode_id = str_uuid_factory()
     _, file_extension = os.path.splitext(episode_file.filename)
