@@ -57,7 +57,7 @@ async def create_show(show_create_param: ShowCreate,
 
 @shows_router.get("/my", response_model=Page[ShowResponse])
 async def list_my_shows(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends(),
-                        user: UserDB = Depends(current_active_user)):
+                        user: User = Depends(current_active_user)):
     conditions = [(model_field == field_val) for model_field, field_val in [(Show.title, show_name),
                                                                             (Show.featured, featured),
                                                                             (Show.owner, user.id)

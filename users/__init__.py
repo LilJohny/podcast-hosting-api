@@ -1,3 +1,2 @@
-from users.authentication.auth_backend import auth_backend
-from users.models import UserDB
-from users.users import fastapi_users, current_active_user
+from users.db import User, UserAdmin
+from users.user_manager import current_active_user, fastapi_users, auth_backend
