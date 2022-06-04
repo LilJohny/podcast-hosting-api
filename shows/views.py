@@ -1,5 +1,6 @@
 import datetime
 import uuid
+import operator
 from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File
@@ -57,10 +58,14 @@ async def create_show(show_create_param: ShowCreate,
 @shows_router.get("/my", response_model=Page[ShowResponse])
 async def list_my_shows(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends(),
                         user: User = Depends(current_active_user)):
-    conditions = [(model_field == field_val) for model_field, field_val in [(Show.title, show_name),
-                                                                            (Show.featured, featured),
-                                                                            (Show.owner, user.id)
-                                                                            ] if field_val is not None]
+    conditions = [
+        (op(model_field, field_val)) for model_field, field_val, op in
+        [
+            (Show.title, show_name, operator.contains),
+            (Show.featured, featured, operator.eq),
+            (Show.owner, user.id, operator.eq)
+        ] if field_val is not None
+    ]
     shows = await get_entities(Show, conditions)
     shows = serialize(shows, ShowResponse, many=True)
     return paginate(shows, params)
