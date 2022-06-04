@@ -5,6 +5,7 @@ from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File
 from fastapi_pagination import Page, paginate, Params
+from sqlalchemy.testing import in_
 
 from images.views import create_image
 from models import str_uuid_factory
@@ -61,7 +62,7 @@ async def list_my_shows(show_name: Optional[str] = None, featured: Optional[bool
     conditions = [
         (op(model_field, field_val)) for model_field, field_val, op in
         [
-            (Show.title, show_name, operator.contains),
+            (Show.title, show_name, in_),
             (Show.featured, featured, operator.eq),
             (Show.owner, user.id, operator.eq)
         ] if field_val is not None
