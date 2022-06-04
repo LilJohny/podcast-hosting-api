@@ -1,11 +1,9 @@
 import datetime
 import uuid
-import operator
 from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File
 from fastapi_pagination import Page, paginate, Params
-from sqlalchemy.testing import in_
 
 from images.views import create_image
 from models import str_uuid_factory
@@ -60,13 +58,15 @@ async def create_show(show_create_param: ShowCreate,
 async def list_my_shows(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends(),
                         user: User = Depends(current_active_user)):
     conditions = [
-        (op(model_field, field_val)) for model_field, field_val, op in
-        [
-            (Show.title, show_name, in_),
-            (Show.featured, featured, operator.eq),
-            (Show.owner, user.id, operator.eq)
+        (model_field == field_val) for model_field, field_val in [
+            (Show.featured, featured),
+            (Show.owner, user.id)
         ] if field_val is not None
     ]
+
+    if show_name:
+        conditions.append(Show.title.contains(show_name))
+
     shows = await get_entities(Show, conditions)
     shows = serialize(shows, ShowResponse, many=True)
     return paginate(shows, params)
