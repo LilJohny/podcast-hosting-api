@@ -43,7 +43,10 @@ async def create_show(show_create_param: ShowCreate,
                                           image_dto,
                                           PodcastOwnerDTO(name=user.email, email=user.email))
     feed_file_link = await upload_file_to_s3(f"{show_id.replace('-', '')}.xml", rss_feed.decode('utf-8'), FileKind.XML)
-    show = Show(**show_create_param.dict(),
+
+    show_create_param_data = show_create_param.dict()
+    series_param = show_create_param_data.pop("series")
+    show = Show(**show_create_param_data,
                 id=show_id,
                 image=image.id,
                 show_link=show_link,
@@ -53,6 +56,9 @@ async def create_show(show_create_param: ShowCreate,
                 owner=user.id,
                 feed_file_link=feed_file_link)
     await save_entity(show)
+    for series in series_param:
+        series = Series(name=series, show_id=show_id)
+        await save_entity(series)
     return serialize(show, ShowResponse)
 
 

@@ -2,13 +2,11 @@ import datetime
 import enum
 import uuid
 import uuid as uuid_lib
-from typing import Set
-
+from typing import Set, List
 from sqladmin import ModelAdmin
-from sqlalchemy.dialects.postgresql import ARRAY
-from sqlmodel import SQLModel, Field, Enum, Column, String
+from sqlmodel import SQLModel, Field, Enum, Column, Relationship
 from models import DeletableModel, UUIDModel
-
+from series.models import Series
 from users.db import User
 
 
@@ -20,20 +18,23 @@ class Category(str, enum.Enum):
     arts_books = "Arts/Books"
 
 
-class ShowCreate(SQLModel):
+class BaseShow(SQLModel):
     title: str
     description: str
     language: Language = Field(sa_column=Column(Enum(Language)))
     show_copyright: str
     category: Category = Field(sa_column=Column(Enum(Category)))
-    series: Set[str] = Field(default=None, sa_column=Column(ARRAY(String())))
+
+
+class ShowCreate(BaseShow):
+    series: Set[str]
 
 
 class ShowUpdate(ShowCreate):
     pass
 
 
-class Show(ShowUpdate, UUIDModel, DeletableModel, table=True):
+class Show(BaseShow, UUIDModel, DeletableModel, table=True):
     show_link: str
     media_link: str
     generator: str
@@ -43,6 +44,9 @@ class Show(ShowUpdate, UUIDModel, DeletableModel, table=True):
     owner: uuid.UUID = Field(default=None, foreign_key=User.id)
     last_build_date: datetime.datetime
     feed_file_link: str
+    series_lst: List["Series"] = Relationship(
+        back_populates="show"
+    )
 
 
 class ShowResponse(Show):
@@ -53,7 +57,6 @@ class ShowResponse(Show):
 class ShowAdmin(ModelAdmin, model=Show):
     column_list = [Show.language,
                    Show.category,
-                   Show.series,
                    Show.is_removed,
                    Show.id,
                    Show.title,
