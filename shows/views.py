@@ -109,7 +109,8 @@ async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowRespons
 
 @shows_router.get("/{show_id}")
 async def read_show(show_id: uuid.UUID) -> ShowResponse:
-    return await read_entity(show_id, Show, ShowResponse)
+    show = await get_entity(show_id, Show, additional_columns=[sql_functions.array_agg(Series.name)], join_models=[Series])
+    return serialize(dict(**show[0].dict(), series=show[1]), ShowResponse)
 
 
 @shows_router.get("/", response_model=Page[ShowResponse])
