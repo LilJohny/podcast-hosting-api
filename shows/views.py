@@ -95,15 +95,22 @@ async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowRespons
 
 @shows_router.get("/{show_id}")
 async def read_show(show_id: uuid.UUID) -> ShowResponse:
-    show = await get_entity(show_id, Show, additional_columns=[sql_functions.array_agg(Series.name)], join_models=[Series])
+    show = await get_entity(
+        show_id,
+        Show,
+        additional_columns=[sql_functions.array_agg(Series.name)],
+        join_models=[Series]
+    )
     return serialize(dict(**show[0].dict(), series=show[1]), ShowResponse)
 
 
 @shows_router.get("/", response_model=Page[ShowResponse])
 async def list_all_shows(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends()):
-    conditions = [(model_field == field_val) for model_field, field_val in [(Show.title, show_name),
-                                                                            (Show.featured, featured)
-                                                                            ] if field_val is not None]
+    conditions = []
+    if featured:
+        conditions.append(Show.featured == featured)
+    if show_name:
+        conditions.append(Show.title.contains(show_name))
     shows = await list_shows(conditions)
     return paginate(shows, params)
 
