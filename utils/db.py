@@ -1,5 +1,6 @@
 from typing import Type, Optional, List
 
+from sqlalchemy.engine import Row
 from sqlalchemy.future import select
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import SQLModel
@@ -18,7 +19,8 @@ def prepare_base_select(
         entity: Optional[Type[SQLModel]] = None,
         additional_columns: Optional[list] = None,
         only_columns: Optional[list] = None,
-        join_model: Optional[Type[SQLModel]] = None):
+        join_model: Optional[Type[SQLModel]] = None
+):
     if not only_columns:
         base_select = select(entity, *additional_columns) if additional_columns else select(entity)
     else:
@@ -29,11 +31,13 @@ def prepare_base_select(
     return base_select
 
 
-async def get_entity(entity_id: str,
-                     entity: Optional[Type[SQLModel]] = None,
-                     additional_columns: Optional[list] = None,
-                     only_columns: Optional[list] = None,
-                     join_model: Optional[Type[SQLModel]] = None):
+async def get_entity(
+        entity_id: str,
+        entity: Optional[Type[SQLModel]] = None,
+        additional_columns: Optional[list] = None,
+        only_columns: Optional[list] = None,
+        join_model: Optional[Type[SQLModel]] = None
+) -> SQLModel:
     async with async_session_maker() as session:
         async with session.begin():
             base_select = prepare_base_select(entity, additional_columns, only_columns, join_model)
@@ -43,11 +47,13 @@ async def get_entity(entity_id: str,
     return item[0] if item else None
 
 
-async def get_entities(entity: Type[SQLModel],
-                       conditions: Optional[List[BinaryExpression]] = None,
-                       additional_columns: Optional[list] = None,
-                       only_columns: Optional[list] = None,
-                       join_model: Optional[Type[SQLModel]] = None):
+async def get_entities(
+        entity: Type[SQLModel],
+        conditions: Optional[List[BinaryExpression]] = None,
+        additional_columns: Optional[list] = None,
+        only_columns: Optional[list] = None,
+        join_model: Optional[Type[SQLModel]] = None
+) -> List[Row]:
     async with async_session_maker() as session:
         async with session.begin():
             base_select = prepare_base_select(entity, additional_columns, only_columns, join_model)
@@ -58,4 +64,4 @@ async def get_entities(entity: Type[SQLModel],
                     query = query.where(condition)
             result = await session.execute(query)
 
-    return [row for row in result.all()]
+    return result.all()
