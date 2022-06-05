@@ -45,15 +45,15 @@ async def get_entity(
         entity: Optional[Type[SQLModel]] = None,
         additional_columns: Optional[list] = None,
         only_columns: Optional[list] = None,
-        join_model: Optional[Type[SQLModel]] = None
+        join_models: Optional[List[Type[SQLModel]]] = None,
 ) -> SQLModel:
     async with async_session_maker() as session:
         async with session.begin():
-            base_select = prepare_base_select(entity, additional_columns, only_columns, join_model)
+            base_select = prepare_base_select(entity, additional_columns, only_columns, join_models)
             result = await session.execute(
                 base_select.filter(entity.id == entity_id).filter(entity.is_removed == False))
             item = result.first()
-    return item[0] if item else None
+    return item
 
 
 async def get_entities(
