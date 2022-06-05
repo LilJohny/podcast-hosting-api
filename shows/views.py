@@ -56,10 +56,9 @@ async def create_show(show_create_param: ShowCreate,
                 owner=user.id,
                 feed_file_link=feed_file_link)
     await save_entity(show)
-    for series in series_param:
-        series = Series(name=series, show_id=show_id)
-        await save_entity(series)
-    return serialize(show, ShowResponse)
+    series_arr = [Series(name=series_name, show_id=show_id) for series_name in series_param]
+    await save_entities(series_arr)
+    return serialize(dict(**show.dict(), series=series_param), ShowResponse)
 
 
 @shows_router.get("/my", response_model=Page[ShowResponse])
@@ -84,12 +83,17 @@ async def list_my_shows(
         conditions,
         additional_columns=[
             sql_functions.count(Episode.id),
-            sql_functions.coalesce(sql_functions.sum(Episode.duration), 0)
+            sql_functions.coalesce(sql_functions.sum(Episode.duration), 0),
+            sql_functions.array_agg(Series.name)
         ],
-        join_model=Episode
+        join_models=[Episode, Series],
     )
-    shows = [dict(**show[0].dict(), episodes_number=show[1], duration=show[2]) for show in shows]
     print(shows)
+    shows = [dict(**show[0].dict(),
+                  episodes_number=show[1],
+                  duration=show[2],
+                  series=show[3]) for show in shows]
+
     shows = serialize(shows, ShowResponse, many=True)
     return paginate(shows, params)
 

@@ -8,6 +8,14 @@ from sqlmodel import SQLModel
 from settings import async_session_maker
 
 
+async def save_entities(entities: List[SQLModel]):
+    async with async_session_maker() as session:
+        async with session.begin():
+            for entity in entities:
+                session.add(entity)
+        await session.commit()
+
+
 async def save_entity(entity: SQLModel):
     async with async_session_maker() as session:
         async with session.begin():
@@ -19,16 +27,17 @@ def prepare_base_select(
         entity: Optional[Type[SQLModel]] = None,
         additional_columns: Optional[list] = None,
         only_columns: Optional[list] = None,
-        join_model: Optional[Type[SQLModel]] = None
+        join_models: Optional[List[Type[SQLModel]]] = None,
 ):
     if not only_columns:
         base_select = select(entity, *additional_columns) if additional_columns else select(entity)
     else:
         base_select = select(*only_columns)
 
-    if join_model:
-        base_select = base_select.join(join_model, isouter=True).group_by(entity.id)
-    return base_select
+    if join_models:
+        for join_model in join_models:
+            base_select = base_select.join(join_model, isouter=True)
+    return base_select.group_by(entity.id)
 
 
 async def get_entity(
@@ -52,11 +61,11 @@ async def get_entities(
         conditions: Optional[List[BinaryExpression]] = None,
         additional_columns: Optional[list] = None,
         only_columns: Optional[list] = None,
-        join_model: Optional[Type[SQLModel]] = None
+        join_models: Optional[List[Type[SQLModel]]] = None,
 ) -> List[Row]:
     async with async_session_maker() as session:
         async with session.begin():
-            base_select = prepare_base_select(entity, additional_columns, only_columns, join_model)
+            base_select = prepare_base_select(entity, additional_columns, only_columns, join_models)
 
             query = base_select.filter(entity.is_removed == False)
             if conditions:

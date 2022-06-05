@@ -2,11 +2,10 @@ import datetime
 import enum
 import uuid
 import uuid as uuid_lib
-from typing import Set, List
+from typing import Set, List, Optional
 from sqladmin import ModelAdmin
-from sqlmodel import SQLModel, Field, Enum, Column, Relationship
+from sqlmodel import SQLModel, Field, Enum, Column
 from models import DeletableModel, UUIDModel
-from series.models import Series
 from users.db import User
 
 
@@ -44,14 +43,17 @@ class Show(BaseShow, UUIDModel, DeletableModel, table=True):
     owner: uuid.UUID = Field(default=None, foreign_key=User.id)
     last_build_date: datetime.datetime
     feed_file_link: str
-    series_lst: List["Series"] = Relationship(
-        back_populates="show"
-    )
 
 
 class ShowResponse(Show):
     duration: int
     episodes_number: int
+    series: Optional[List[str]]
+
+
+class Series(UUIDModel, table=True):
+    name: str = Field(primary_key=True, nullable=False)
+    show_id: uuid.UUID = Field(nullable=False, foreign_key=Show.id)
 
 
 class ShowAdmin(ModelAdmin, model=Show):
