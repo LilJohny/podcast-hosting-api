@@ -126,9 +126,8 @@ async def list_shows(conditions):
         ],
         join_models=[Episode, Series],
     )
-    shows = [dict(**show[0].dict(),
-                  episodes_number=show[1],
-                  duration=show[2],
-                  series=show[3] if show[3][0] else []) for show in shows]
-    shows = serialize(shows, ShowResponse, many=True)
+    shows = [ShowResponse(**show[0].dict(),
+                          episodes_number=show[1],
+                          duration=show[2],
+                          series=show[3] if show[3][0] else []) for show in shows]
     return shows
