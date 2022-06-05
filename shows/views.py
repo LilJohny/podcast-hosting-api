@@ -84,16 +84,14 @@ async def list_my_shows(
         additional_columns=[
             sql_functions.count(Episode.id),
             sql_functions.coalesce(sql_functions.sum(Episode.duration), 0),
-            sql_functions.coalesce(sql_functions.array_agg(Series.name), [])
+            sql_functions.array_agg(Series.name),
         ],
         join_models=[Episode, Series],
     )
-    print(shows)
     shows = [dict(**show[0].dict(),
                   episodes_number=show[1],
                   duration=show[2],
-                  series=show[3]) for show in shows]
-
+                  series=show[3] if show[3][0] else []) for show in shows]
     shows = serialize(shows, ShowResponse, many=True)
     return paginate(shows, params)
 
