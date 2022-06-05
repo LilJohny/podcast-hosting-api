@@ -5,8 +5,8 @@ import uuid as uuid_lib
 from typing import Set
 
 from sqladmin import ModelAdmin
-from sqlmodel import SQLModel, Field, Enum, Column, String, ARRAY
-
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlmodel import SQLModel, Field, Enum, Column, String
 from models import DeletableModel, UUIDModel
 
 from users.db import User
@@ -33,7 +33,7 @@ class ShowUpdate(ShowCreate):
     pass
 
 
-class ShowResponse(ShowUpdate, UUIDModel):
+class Show(ShowUpdate, UUIDModel, DeletableModel, table=True):
     show_link: str
     media_link: str
     generator: str
@@ -45,8 +45,9 @@ class ShowResponse(ShowUpdate, UUIDModel):
     feed_file_link: str
 
 
-class Show(ShowResponse, DeletableModel, table=True):
-    pass
+class ShowResponse(Show):
+    duration: int
+    episodes_number: int
 
 
 class ShowAdmin(ModelAdmin, model=Show):

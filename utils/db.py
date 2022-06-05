@@ -14,20 +14,48 @@ async def save_entity(entity: SQLModel):
         await session.commit()
 
 
-async def get_entity(entity_id: str, entity: Type[SQLModel]):
+def prepare_base_select(
+        entity: Optional[Type[SQLModel]] = None,
+        additional_columns: Optional[list] = None,
+        only_columns: Optional[list] = None,
+        join_model: Optional[Type[SQLModel]] = None):
+    if not only_columns:
+        base_select = select(entity, *additional_columns) if additional_columns else select(entity)
+    else:
+        base_select = select(*only_columns)
+
+    if join_model:
+        base_select = base_select.join(join_model, isouter=True).group_by(entity.id)
+    return base_select
+
+
+async def get_entity(entity_id: str,
+                     entity: Optional[Type[SQLModel]] = None,
+                     additional_columns: Optional[list] = None,
+                     only_columns: Optional[list] = None,
+                     join_model: Optional[Type[SQLModel]] = None):
     async with async_session_maker() as session:
         async with session.begin():
-            result = await session.execute(select(entity).filter_by(id=entity_id, is_removed=False))
+            base_select = prepare_base_select(entity, additional_columns, only_columns, join_model)
+            result = await session.execute(
+                base_select.filter(entity.id == entity_id).filter(entity.is_removed == False))
             item = result.first()
     return item[0] if item else None
 
 
-async def get_entities(entity: Type[SQLModel], conditions: Optional[List[BinaryExpression]] = None):
+async def get_entities(entity: Type[SQLModel],
+                       conditions: Optional[List[BinaryExpression]] = None,
+                       additional_columns: Optional[list] = None,
+                       only_columns: Optional[list] = None,
+                       join_model: Optional[Type[SQLModel]] = None):
     async with async_session_maker() as session:
         async with session.begin():
-            query = select(entity).filter_by(is_removed=False)
+            base_select = prepare_base_select(entity, additional_columns, only_columns, join_model)
+
+            query = base_select.filter(entity.is_removed == False)
             if conditions:
                 for condition in conditions:
                     query = query.where(condition)
             result = await session.execute(query)
-    return [row[0] for row in result.all()]
+
+    return [row for row in result.all()]

@@ -4,7 +4,9 @@ from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File
 from fastapi_pagination import Page, paginate, Params
+from sqlalchemy.sql import functions as sql_functions
 
+from episodes.models import Episode
 from images.views import create_image
 from models import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
@@ -55,8 +57,12 @@ async def create_show(show_create_param: ShowCreate,
 
 
 @shows_router.get("/my", response_model=Page[ShowResponse])
-async def list_my_shows(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends(),
-                        user: User = Depends(current_active_user)):
+async def list_my_shows(
+        show_name: Optional[str] = None,
+        featured: Optional[bool] = None,
+        params: Params = Depends(),
+        user: User = Depends(current_active_user)
+) -> ShowResponse:
     conditions = [
         (model_field == field_val) for model_field, field_val in [
             (Show.featured, featured),
@@ -67,7 +73,17 @@ async def list_my_shows(show_name: Optional[str] = None, featured: Optional[bool
     if show_name:
         conditions.append(Show.title.contains(show_name))
 
-    shows = await get_entities(Show, conditions)
+    shows = await get_entities(
+        Show,
+        conditions,
+        additional_columns=[
+            sql_functions.count(Episode.id),
+            sql_functions.coalesce(sql_functions.sum(Episode.duration), 0)
+        ],
+        join_model=Episode
+    )
+    shows = [dict(**show[0].dict(), episodes_number=show[1], duration=show[2]) for show in shows]
+    print(shows)
     shows = serialize(shows, ShowResponse, many=True)
     return paginate(shows, params)
 
