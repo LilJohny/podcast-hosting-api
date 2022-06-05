@@ -78,21 +78,7 @@ async def list_my_shows(
     if show_name:
         conditions.append(Show.title.contains(show_name))
 
-    shows = await get_entities(
-        Show,
-        conditions,
-        additional_columns=[
-            sql_functions.count(Episode.id),
-            sql_functions.coalesce(sql_functions.sum(Episode.duration), 0),
-            sql_functions.array_agg(Series.name),
-        ],
-        join_models=[Episode, Series],
-    )
-    shows = [dict(**show[0].dict(),
-                  episodes_number=show[1],
-                  duration=show[2],
-                  series=show[3] if show[3][0] else []) for show in shows]
-    shows = serialize(shows, ShowResponse, many=True)
+    shows = await list_shows(conditions)
     return paginate(shows, params)
 
 
@@ -114,10 +100,28 @@ async def read_show(show_id: uuid.UUID) -> ShowResponse:
 
 
 @shows_router.get("/", response_model=Page[ShowResponse])
-async def list_show(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends()):
+async def list_all_shows(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends()):
     conditions = [(model_field == field_val) for model_field, field_val in [(Show.title, show_name),
                                                                             (Show.featured, featured)
                                                                             ] if field_val is not None]
-    shows = await get_entities(Show, conditions)
-    shows = serialize(shows, ShowResponse, many=True)
+    shows = await list_shows(conditions)
     return paginate(shows, params)
+
+
+async def list_shows(conditions):
+    shows = await get_entities(
+        Show,
+        conditions,
+        additional_columns=[
+            sql_functions.count(Episode.id),
+            sql_functions.coalesce(sql_functions.sum(Episode.duration), 0),
+            sql_functions.array_agg(Series.name),
+        ],
+        join_models=[Episode, Series],
+    )
+    shows = [dict(**show[0].dict(),
+                  episodes_number=show[1],
+                  duration=show[2],
+                  series=show[3] if show[3][0] else []) for show in shows]
+    shows = serialize(shows, ShowResponse, many=True)
+    return shows
