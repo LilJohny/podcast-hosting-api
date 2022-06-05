@@ -84,7 +84,7 @@ async def list_my_shows(
         additional_columns=[
             sql_functions.count(Episode.id),
             sql_functions.coalesce(sql_functions.sum(Episode.duration), 0),
-            sql_functions.array_agg(Series.name)
+            sql_functions.coalesce(sql_functions.array_agg(Series.name), [])
         ],
         join_models=[Episode, Series],
     )
