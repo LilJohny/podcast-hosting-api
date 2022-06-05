@@ -23,7 +23,7 @@ class EpisodeParam(SQLModel):
     series: str = Field(default=None, nullable=True)
 
 
-class EpisodeResponse(EpisodeParam, UUIDModel):
+class EpisodeBase(EpisodeParam):
     file_link: str
     episode_link: str
     episode_guid: str
@@ -31,7 +31,11 @@ class EpisodeResponse(EpisodeParam, UUIDModel):
     duration: int
 
 
-class Episode(EpisodeResponse, DeletableModel, table=True):
+class EpisodeResponse(EpisodeBase, UUIDModel):
+    cover_link: str
+
+
+class Episode(EpisodeBase, UUIDModel, DeletableModel, table=True):
     cover_image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
 
 

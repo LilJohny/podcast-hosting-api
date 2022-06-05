@@ -7,10 +7,11 @@ from fastapi import APIRouter, status, Depends, UploadFile, File, HTTPException
 from fastapi_pagination import Params, paginate, Page
 
 from episodes.models import EpisodeParam, Episode, EpisodeResponse
+from images.models import Image
 from images.views import create_image
 from models import str_uuid_factory
 from utils.audio import DURATION_FINDERS
-from utils.db import save_entity, get_entities
+from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
 from utils.serializers import serialize
 from views import delete_entity, update_entity, read_entity
@@ -58,7 +59,14 @@ async def update_episode(episode_id: uuid.UUID, episode_param: EpisodeParam) -> 
 
 @episodes_router.get("/{episode_id}")
 async def read_episode(episode_id: uuid.UUID) -> EpisodeResponse:
-    return await read_entity(episode_id, Episode, EpisodeResponse)
+    episode = await get_entity(
+        episode_id,
+        Episode,
+        additional_columns=[Image.file_url],
+        join_models=[Image],
+        additional_group_by_columns=[Image.file_url]
+    )
+    return EpisodeResponse(**episode[0].dict(), cover_link=episode[1])
 
 
 @episodes_router.get("/", response_model=Page[EpisodeResponse])
