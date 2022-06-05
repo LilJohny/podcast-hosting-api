@@ -10,10 +10,10 @@ from episodes.models import Episode
 from images.views import create_image
 from models import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
-from shows.models import ShowUpdate, Show, ShowResponse, ShowCreate
+from shows.models import ShowUpdate, Show, ShowResponse, ShowCreate, Series
 from users import User, current_active_user
 from utils.constants import GENERATOR_VERSION
-from utils.db import save_entity, get_entities
+from utils.db import save_entity, get_entities, get_entity, save_entities
 from utils.files import upload_file_to_s3, FileKind
 from utils.serializers import serialize
 from views import delete_entity, update_entity, read_entity
