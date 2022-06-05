@@ -78,7 +78,17 @@ async def list_episode(show_id: Optional[uuid.UUID] = None,
                                                                             (Episode.series, series),
                                                                             (Episode.title, episode_title)
                                                                             ] if field_val is not None]
-
-    episodes = await get_entities(Episode, conditions)
-    episodes = serialize(episodes, EpisodeResponse, many=True)
+    episodes = await get_entities(
+        Episode,
+        conditions,
+        additional_columns=[
+            Image.file_url
+        ],
+        join_models=[Image],
+        additional_group_by_columns=[Image.file_url]
+    )
+    episodes = [EpisodeResponse(
+        **episode[0].dict(),
+        cover_link=episode[1]
+    ) for episode in episodes]
     return paginate(episodes, params)

@@ -64,10 +64,11 @@ async def get_entities(
         additional_columns: Optional[list] = None,
         only_columns: Optional[list] = None,
         join_models: Optional[List[Type[SQLModel]]] = None,
+        additional_group_by_columns: Optional[list] = None
 ) -> List[Row]:
     async with async_session_maker() as session:
         async with session.begin():
-            base_select = prepare_base_select(entity, additional_columns, only_columns, join_models)
+            base_select = prepare_base_select(entity, additional_columns, only_columns, join_models, additional_group_by_columns)
 
             query = base_select.filter(entity.is_removed == False)
             if conditions:
