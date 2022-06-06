@@ -126,21 +126,22 @@ async def list_all_shows(show_name: Optional[str] = None, featured: Optional[boo
 
 
 async def list_shows(conditions):
-    shows = await get_entities(
+    shows_episodes = await get_entities(
         Show,
         conditions,
         additional_columns=[
-            sql_functions.count(Episode.id),
-            sql_functions.coalesce(sql_functions.sum(Episode.duration), 0),
-            sql_functions.array_agg(Series.name),
+            sql_functions.count(Episode.id.distinct()),
+            sql_functions.coalesce(sql_functions.sum(Episode.duration), 0)
         ],
-        join_models=[Episode, Series],
+        join_models=[Episode],
     )
+    series = await get_entities(Show, conditions, only_columns=[Show.id, sql_functions.array_agg(Series.name.distinct())], join_models=[Series])
+
     shows = [ShowResponse(
-        **show[0].dict(),
-        episodes_number=show[1],
-        duration=show[2],
-        series=list(set(show[3])),
-        selected_streamings=from_streaming_options_db(show[0].streaming_options)
-    ) for show in shows]
+        **show_fields[0][0].dict(),
+        episodes_number=show_fields[0][1],
+        duration=show_fields[0][2],
+        series=show_fields[1][1],
+        selected_streamings=from_streaming_options_db(shows_episodes[0][0].streaming_options)
+    ) for show_fields in zip(shows_episodes, series)]
     return shows
