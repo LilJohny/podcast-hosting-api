@@ -49,7 +49,7 @@ async def get_entity(
         only_columns: Optional[list] = None,
         join_models: Optional[List[Type[SQLModel]]] = None,
         additional_group_by_columns: Optional[list] = None
-) -> SQLModel:
+) -> Row:
     async with async_session_maker() as session:
         async with session.begin():
             base_select = prepare_base_select(entity, additional_columns, only_columns, join_models, additional_group_by_columns)
