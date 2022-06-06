@@ -3,7 +3,6 @@ import enum
 import uuid
 import uuid as uuid_lib
 from typing import Set, List, Optional
-from sqladmin import ModelAdmin
 from sqlmodel import SQLModel, Field, Enum, Column
 from models import DeletableModel, UUIDModel
 from users.db import User
@@ -49,22 +48,3 @@ class ShowResponse(Show):
     duration: int
     episodes_number: int
     series: Optional[List[str]]
-
-
-class ShowAdmin(ModelAdmin, model=Show):
-    column_list = [Show.language,
-                   Show.category,
-                   Show.is_removed,
-                   Show.id,
-                   Show.title,
-                   Show.description,
-                   Show.show_copyright,
-                   Show.show_link,
-                   Show.media_link,
-                   Show.generator,
-                   Show.featured,
-                   Show.image,
-                   Show.is_locked,
-                   Show.owner,
-                   Show.last_build_date,
-                   Show.feed_file_link]

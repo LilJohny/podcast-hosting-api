@@ -3,15 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from sqladmin import Admin
 
-from episodes import episodes_router
-from episodes.models import EpisodeAdmin
-from images import images_router
-from images.models import ImageAdmin
+from episodes import episodes_router, EpisodeAdmin
+from images import images_router, ImageAdmin
+from series import SeriesAdmin
 from settings import ENGINE
-from shows import shows_router
-from shows.models import ShowAdmin
-from users import auth_backend, User, UserAdmin, fastapi_users, current_active_user
-from users.schemas import UserRead, UserCreate, UserUpdate
+from shows import shows_router, ShowAdmin
+from users import User, UserRead, UserCreate, UserUpdate, UserAdmin, fastapi_users, current_active_user, auth_backend
 from utils.rss import rss_router
 
 app = FastAPI()
@@ -22,6 +19,7 @@ admin.register_model(UserAdmin)
 admin.register_model(ImageAdmin)
 admin.register_model(ShowAdmin)
 admin.register_model(EpisodeAdmin)
+admin.register_model(SeriesAdmin)
 
 origins = ['*']
 
@@ -62,6 +60,7 @@ app.include_router(episodes_router, tags=["episodes"])
 app.include_router(rss_router)
 
 add_pagination(app)
+
 
 @app.get("/")
 async def root():
