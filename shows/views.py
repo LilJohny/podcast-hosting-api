@@ -140,7 +140,7 @@ async def list_shows(conditions):
         **show[0].dict(),
         episodes_number=show[1],
         duration=show[2],
-        series=show[3] if show[3][0] else [],
+        series=list(set(show[3])),
         selected_streamings=from_streaming_options_db(show[0].streaming_options)
     ) for show in shows]
     return shows
