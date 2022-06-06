@@ -1,7 +1,7 @@
 import uuid
 
-from fastapi import status, APIRouter, Depends, UploadFile, File
-from fastapi_pagination import paginate, Page, Params
+from fastapi import status, APIRouter, UploadFile, File
+from fastapi_pagination import paginate, Page
 
 from images.models import Image, ImageResponse
 from utils.db import save_entity, get_entities
@@ -32,7 +32,7 @@ async def read_image(image_id: uuid.UUID) -> ImageResponse:
 
 
 @images_router.get("/", response_model=Page[ImageResponse])
-async def list_images(params: Params = Depends()):
+async def list_images():
     images = await get_entities(Image)
     images = serialize(images, ImageResponse, many=True)
-    return paginate(images, params)
+    return paginate(images)

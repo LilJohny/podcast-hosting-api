@@ -3,7 +3,7 @@ import uuid
 from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File
-from fastapi_pagination import Page, paginate, Params
+from fastapi_pagination import Page, paginate
 from sqlalchemy.sql import functions as sql_functions
 
 from episodes.models import Episode
@@ -67,7 +67,6 @@ async def create_show(show_create_param: ShowCreate,
 async def list_my_shows(
         show_name: Optional[str] = None,
         featured: Optional[bool] = None,
-        params: Params = Depends(),
         user: User = Depends(current_active_user)
 ) -> Page[ShowResponse]:
     conditions = [
@@ -81,7 +80,7 @@ async def list_my_shows(
         conditions.append(Show.title.contains(show_name))
 
     shows = await list_shows(conditions)
-    return paginate(shows, params)
+    return paginate(shows)
 
 
 @shows_router.delete("/{show_id}")
@@ -107,14 +106,14 @@ async def read_show(show_id: uuid.UUID) -> ShowResponse:
 
 
 @shows_router.get("/", response_model=Page[ShowResponse])
-async def list_all_shows(show_name: Optional[str] = None, featured: Optional[bool] = None, params: Params = Depends()):
+async def list_all_shows(show_name: Optional[str] = None, featured: Optional[bool] = None):
     conditions = []
     if featured:
         conditions.append(Show.featured == featured)
     if show_name:
         conditions.append(Show.title.contains(show_name))
     shows = await list_shows(conditions)
-    return paginate(shows, params)
+    return paginate(shows)
 
 
 async def list_shows(conditions):

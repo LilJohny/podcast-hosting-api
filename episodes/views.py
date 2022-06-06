@@ -3,8 +3,8 @@ import os
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, status, Depends, UploadFile, File, HTTPException
-from fastapi_pagination import Params, paginate, Page
+from fastapi import APIRouter, status, UploadFile, File, HTTPException
+from fastapi_pagination import paginate, Page
 
 from episodes.models import EpisodeParam, Episode, EpisodeResponse
 from images.models import Image
@@ -70,10 +70,11 @@ async def read_episode(episode_id: uuid.UUID) -> EpisodeResponse:
 
 
 @episodes_router.get("/", response_model=Page[EpisodeResponse])
-async def list_episode(show_id: Optional[uuid.UUID] = None,
-                       series: Optional[str] = None,
-                       episode_title: Optional[str] = None,
-                       params: Params = Depends()):
+async def list_episode(
+        show_id: Optional[uuid.UUID] = None,
+        series: Optional[str] = None,
+        episode_title: Optional[str] = None
+) -> Page[EpisodeResponse]:
     conditions = [(model_field == field_val) for model_field, field_val in [(Episode.show_id, show_id),
                                                                             (Episode.series, series),
                                                                             (Episode.title, episode_title)
@@ -91,4 +92,4 @@ async def list_episode(show_id: Optional[uuid.UUID] = None,
         **episode[0].dict(),
         cover_link=episode[1]
     ) for episode in episodes]
-    return paginate(episodes, params)
+    return paginate(episodes)

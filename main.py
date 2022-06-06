@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_pagination import add_pagination
 from sqladmin import Admin
 
 from episodes import episodes_router
@@ -60,6 +61,7 @@ app.include_router(images_router, tags=["images"])
 app.include_router(episodes_router, tags=["episodes"])
 app.include_router(rss_router)
 
+add_pagination(app)
 
 @app.get("/")
 async def root():
