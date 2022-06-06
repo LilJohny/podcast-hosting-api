@@ -1,6 +1,7 @@
 import uuid
 from typing import Type, Optional, List
 
+from utils.pagination import paginate
 from sqlalchemy.engine import Row
 from sqlalchemy.future import select
 from sqlalchemy.sql.elements import BinaryExpression
@@ -79,6 +80,6 @@ async def get_entities(
             if conditions:
                 for condition in conditions:
                     query = query.where(condition)
-            result = await session.execute(query)
+            result = await paginate(session, query)
 
-    return result.all()
+    return result

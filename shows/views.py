@@ -3,7 +3,7 @@ import uuid
 from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File
-from fastapi_pagination import Page, paginate
+from fastapi_pagination import Page, paginate, create_page
 from sqlalchemy.sql import functions as sql_functions
 
 from episodes.models import Episode
@@ -17,7 +17,6 @@ from users import User, current_active_user
 from utils.constants import GENERATOR_VERSION
 from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind
-from utils.serializers import serialize
 from utils.streamings import to_streaming_options_db, from_streaming_options_db
 from views import delete_entity, update_entity
 
@@ -84,8 +83,7 @@ async def list_my_shows(
     if show_name:
         conditions.append(Show.title.ilike(show_name))
 
-    shows = await list_shows(conditions)
-    return paginate(shows)
+    return await list_shows(conditions)
 
 
 @shows_router.delete("/{show_id}")
@@ -126,7 +124,7 @@ async def list_all_shows(show_name: Optional[str] = None, featured: Optional[boo
 
 
 async def list_shows(conditions):
-    shows_episodes = await get_entities(
+    shows_episodes, total, params = await get_entities(
         Show,
         conditions,
         additional_columns=[
@@ -135,13 +133,17 @@ async def list_shows(conditions):
         ],
         join_models=[Episode],
     )
-    series = await get_entities(Show, conditions, only_columns=[Show.id, sql_functions.array_agg(Series.name.distinct())], join_models=[Series])
-
-    shows = [ShowResponse(
-        **show_fields[0][0].dict(),
-        episodes_number=show_fields[0][1],
-        duration=show_fields[0][2],
-        series=show_fields[1][1],
-        selected_streamings=from_streaming_options_db(shows_episodes[0][0].streaming_options)
-    ) for show_fields in zip(shows_episodes, series)]
+    series, total, params = await get_entities(Show, conditions, only_columns=[Show.id, sql_functions.array_agg(
+        Series.name.distinct()).label("series")], join_models=[Series])
+    shows = []
+    for show_fields in zip(shows_episodes, series):
+        shows.append(ShowResponse(
+            **show_fields[0][0].dict(),
+            episodes_number=show_fields[0][1],
+            duration=show_fields[0][2],
+            series=show_fields[1][1],
+            selected_streamings=from_streaming_options_db(shows_episodes[0][0].streaming_options)
+        ).dict()
+                     )
+    shows = create_page(shows, total, params)
     return shows
