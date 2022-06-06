@@ -51,11 +51,6 @@ class ShowResponse(Show):
     series: Optional[List[str]]
 
 
-class Series(UUIDModel, table=True):
-    name: str = Field(primary_key=True, nullable=False)
-    show_id: uuid.UUID = Field(nullable=False, foreign_key=Show.id)
-
-
 class ShowAdmin(ModelAdmin, model=Show):
     column_list = [Show.language,
                    Show.category,

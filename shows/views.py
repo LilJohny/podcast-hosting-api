@@ -10,13 +10,15 @@ from episodes.models import Episode
 from images.views import create_image
 from models import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
-from shows.models import ShowUpdate, Show, ShowResponse, ShowCreate, Series
+from series.models import Series
+from series.views import create_series_batch
+from shows.models import ShowUpdate, Show, ShowResponse, ShowCreate
 from users import User, current_active_user
 from utils.constants import GENERATOR_VERSION
-from utils.db import save_entity, get_entities, get_entity, save_entities
+from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind
 from utils.serializers import serialize
-from views import delete_entity, update_entity, read_entity
+from views import delete_entity, update_entity
 
 shows_router = APIRouter(prefix="/shows")
 
@@ -58,8 +60,7 @@ async def create_show(show_create_param: ShowCreate,
         feed_file_link=feed_file_link
     )
     await save_entity(show)
-    series_arr = [Series(name=series_name, show_id=show_id) for series_name in series_param]
-    await save_entities(series_arr)
+    await create_series_batch(show_id, series_param)
     return ShowResponse(**show.dict(), series=series_param)
 
 
