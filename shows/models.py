@@ -28,8 +28,13 @@ class ShowCreate(BaseShow):
     series: Set[str]
 
 
-class ShowUpdate(ShowCreate):
-    pass
+class ShowUpdate(SQLModel):
+    title: Optional[str]
+    description: Optional[str]
+    language: Optional[Language] = Field(sa_column=Column(Enum(Language)))
+    show_copyright: Optional[str]
+    category: Optional[Category] = Field(sa_column=Column(Enum(Category)))
+    series: Optional[Set[str]]
 
 
 class Show(BaseShow, UUIDModel, DeletableModel, table=True):
