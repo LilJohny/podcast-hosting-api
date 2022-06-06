@@ -18,6 +18,7 @@ from utils.constants import GENERATOR_VERSION
 from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind
 from utils.serializers import serialize
+from utils.streamings import to_streaming_options_db, from_streaming_options_db
 from views import delete_entity, update_entity
 
 shows_router = APIRouter(prefix="/shows")
@@ -47,7 +48,9 @@ async def create_show(show_create_param: ShowCreate,
     feed_file_link = await upload_file_to_s3(f"{show_id.replace('-', '')}.xml", rss_feed.decode('utf-8'), FileKind.XML)
 
     show_create_param_data = show_create_param.dict()
+
     series_param = show_create_param_data.pop("series")
+    selected_streamings = show_create_param_data.pop("selected_streamings")
     show = Show(
         **show_create_param_data,
         id=show_id,
@@ -57,11 +60,12 @@ async def create_show(show_create_param: ShowCreate,
         last_build_date=datetime.datetime.utcnow().replace(tzinfo=None),
         generator=GENERATOR_VERSION,
         owner=user.id,
-        feed_file_link=feed_file_link
+        feed_file_link=feed_file_link,
+        streaming_options=to_streaming_options_db(selected_streamings)
     )
     await save_entity(show)
     await create_series_batch(show_id, series_param)
-    return ShowResponse(**show.dict(), series=series_param)
+    return ShowResponse(**show.dict(), series=series_param, selected_streamings=selected_streamings)
 
 
 @shows_router.get("/my", response_model=Page[ShowResponse])
@@ -103,7 +107,11 @@ async def read_show(show_id: uuid.UUID) -> ShowResponse:
         additional_columns=[sql_functions.array_agg(Series.name)],
         join_models=[Series]
     )
-    return serialize(dict(**show[0].dict(), series=show[1]), ShowResponse)
+    return ShowResponse(
+        **show[0].dict(),
+        series=show[1],
+        selected_streamings=from_streaming_options_db(show[0].streaming_options)
+    )
 
 
 @shows_router.get("/", response_model=Page[ShowResponse])
@@ -128,8 +136,11 @@ async def list_shows(conditions):
         ],
         join_models=[Episode, Series],
     )
-    shows = [ShowResponse(**show[0].dict(),
-                          episodes_number=show[1],
-                          duration=show[2],
-                          series=show[3] if show[3][0] else []) for show in shows]
+    shows = [ShowResponse(
+        **show[0].dict(),
+        episodes_number=show[1],
+        duration=show[2],
+        series=show[3] if show[3][0] else [],
+        selected_streamings=from_streaming_options_db(show[0].streaming_options)
+    ) for show in shows]
     return shows

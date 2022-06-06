@@ -26,6 +26,7 @@ class BaseShow(SQLModel):
 
 class ShowCreate(BaseShow):
     series: Set[str]
+    selected_streamings: List[str]
 
 
 class ShowUpdate(SQLModel):
@@ -47,9 +48,11 @@ class Show(BaseShow, UUIDModel, DeletableModel, table=True):
     owner: uuid.UUID = Field(default=None, foreign_key=User.id)
     last_build_date: datetime.datetime
     feed_file_link: str
+    streaming_options: str = Field(default="000000")
 
 
 class ShowResponse(Show):
     duration: int
     episodes_number: int
     series: Optional[List[str]]
+    selected_streamings: List[str]
