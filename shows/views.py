@@ -58,7 +58,7 @@ async def create_show(show_create_param: ShowCreate,
     await save_entity(show)
     series_arr = [Series(name=series_name, show_id=show_id) for series_name in series_param]
     await save_entities(series_arr)
-    return serialize(dict(**show.dict(), series=series_param), ShowResponse)
+    return ShowResponse(**show.dict(), series=series_param)
 
 
 @shows_router.get("/my", response_model=Page[ShowResponse])
@@ -67,7 +67,7 @@ async def list_my_shows(
         featured: Optional[bool] = None,
         params: Params = Depends(),
         user: User = Depends(current_active_user)
-) -> ShowResponse:
+) -> Page[ShowResponse]:
     conditions = [
         (model_field == field_val) for model_field, field_val in [
             (Show.featured, featured),
