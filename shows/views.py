@@ -46,15 +46,17 @@ async def create_show(show_create_param: ShowCreate,
 
     show_create_param_data = show_create_param.dict()
     series_param = show_create_param_data.pop("series")
-    show = Show(**show_create_param_data,
-                id=show_id,
-                image=image.id,
-                show_link=show_link,
-                media_link=image.file_url,
-                last_build_date=datetime.datetime.utcnow().replace(tzinfo=None),
-                generator=GENERATOR_VERSION,
-                owner=user.id,
-                feed_file_link=feed_file_link)
+    show = Show(
+        **show_create_param_data,
+        id=show_id,
+        image=image.id,
+        show_link=show_link,
+        media_link=image.file_url,
+        last_build_date=datetime.datetime.utcnow().replace(tzinfo=None),
+        generator=GENERATOR_VERSION,
+        owner=user.id,
+        feed_file_link=feed_file_link
+    )
     await save_entity(show)
     series_arr = [Series(name=series_name, show_id=show_id) for series_name in series_param]
     await save_entities(series_arr)
