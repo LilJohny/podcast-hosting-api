@@ -42,12 +42,12 @@ def prepare_base_select(
 
 
 async def get_entity(
-        entity_id: str,
+        entity_id: uuid.UUID,
         entity: Optional[Type[SQLModel]] = None,
         additional_columns: Optional[list] = None,
         only_columns: Optional[list] = None,
         join_models: Optional[List[Type[SQLModel]]] = None,
-        additional_group_by_columns:Optional[list] = None
+        additional_group_by_columns: Optional[list] = None
 ) -> SQLModel:
     async with async_session_maker() as session:
         async with session.begin():
