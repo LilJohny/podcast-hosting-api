@@ -1,3 +1,4 @@
+import uuid
 from typing import Type, Optional, List
 
 from sqlalchemy.engine import Row
