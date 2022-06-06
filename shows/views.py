@@ -82,7 +82,7 @@ async def list_my_shows(
     ]
 
     if show_name:
-        conditions.append(Show.title.contains(show_name))
+        conditions.append(Show.title.ilike(show_name))
 
     shows = await list_shows(conditions)
     return paginate(shows)
@@ -120,7 +120,7 @@ async def list_all_shows(show_name: Optional[str] = None, featured: Optional[boo
     if featured:
         conditions.append(Show.featured == featured)
     if show_name:
-        conditions.append(Show.title.contains(show_name))
+        conditions.append(Show.title.ilike(show_name))
     shows = await list_shows(conditions)
     return paginate(shows)
 
