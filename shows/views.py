@@ -72,7 +72,9 @@ async def create_show(show_create_param: ShowCreate,
         series=series_param,
         selected_streamings=selected_streamings,
         duration=show.duration,
-        episodes_number=show.episodes_number)
+        episodes_number=show.episodes_number,
+        cover_link=image.file_url
+    )
 
 
 @shows_router.get("/my", response_model=Page[ShowResponse])
@@ -110,14 +112,19 @@ async def read_show(show_id: uuid.UUID) -> ShowResponse:
     show = await get_entity(
         show_id,
         Show,
-        opts = [selectinload(Show.series_arr), selectinload(Show.episodes)]
+        opts=[
+            selectinload(Show.series_arr),
+            selectinload(Show.episodes),
+            selectinload(Show.cover_image)
+        ]
     )
     return ShowResponse(
         **show.__dict__,
         duration=show.duration,
         episodes_number=show.episodes_number,
         series=[series.name for series in show.series_arr],
-        selected_streamings=show.selected_streamings
+        selected_streamings=show.selected_streamings,
+        cover_link=show.cover_image.file_url
     )
 
 
@@ -136,7 +143,11 @@ async def list_shows(conditions):
     shows, total, params = await get_entities(
         Show,
         conditions,
-        opts=[selectinload(Show.series_arr), selectinload(Show.episodes)]
+        opts=[
+            selectinload(Show.series_arr),
+            selectinload(Show.episodes),
+            selectinload(Show.cover_image)
+        ]
     )
 
 
@@ -146,7 +157,9 @@ async def list_shows(conditions):
             duration=show[0].duration,
             episodes_number=show[0].episodes_number,
             series=[series.name for series in show[0].series_arr],
-            selected_streamings=show[0].selected_streamings,) for show in shows]
+            selected_streamings=show[0].selected_streamings,
+            cover_link=show[0].cover_image.file_url
+        ) for show in shows]
 
     shows_page = create_page(shows, total, params)
     return shows_page
