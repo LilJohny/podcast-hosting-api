@@ -110,13 +110,14 @@ async def read_show(show_id: uuid.UUID) -> ShowResponse:
     show = await get_entity(
         show_id,
         Show,
-        additional_columns=[sql_functions.array_agg(Series.name)],
-        join_models=[Series]
+        opts = [selectinload(Show.series_arr), selectinload(Show.episodes)]
     )
     return ShowResponse(
-        **show[0].dict(),
-        series=show[1],
-        selected_streamings=from_streaming_options_db(show[0].streaming_options)
+        **show.__dict__,
+        duration=show.duration,
+        episodes_number=show.episodes_number,
+        series=[series.name for series in show.series_arr],
+        selected_streamings=show.selected_streamings
     )
 
 

@@ -55,12 +55,13 @@ async def get_entity(
         additional_columns: Optional[list] = None,
         only_columns: Optional[list] = None,
         join_models: Optional[List[Type[SQLModel]]] = None,
-        additional_group_by_columns: Optional[list] = None
+        additional_group_by_columns: Optional[list] = None,
+        opts:list=None,
 ) -> Row:
     async with async_session_maker() as session:
         async with session.begin():
             base_select = prepare_base_select(entity, additional_columns, only_columns, join_models,
-                                              additional_group_by_columns)
+                                              additional_group_by_columns, opts)
             result = await session.execute(
                 base_select.filter(entity.id == entity_id).filter(entity.is_removed == False))
             item = result.first()
