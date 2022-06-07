@@ -5,13 +5,11 @@ from typing import Optional
 from fastapi import status, APIRouter, Depends, UploadFile, File
 from fastapi_pagination import Page, paginate, create_page
 from sqlalchemy.orm import selectinload
-from sqlalchemy.sql import functions as sql_functions
 
 from episodes.models import Episode
 from images.views import create_image
-from models import str_uuid_factory
+from schemas import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
-from series.models import Series
 from series.views import create_series_batch
 from shows.models import Show
 from shows.schemas import ShowUpdate, ShowResponse, ShowCreate
@@ -19,7 +17,7 @@ from users import User, current_active_user
 from utils.constants import GENERATOR_VERSION
 from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind
-from utils.streamings import to_streaming_options_db, from_streaming_options_db
+from utils.streamings import to_streaming_options_db
 from views import delete_entity, update_entity
 
 shows_router = APIRouter(prefix="/shows")
