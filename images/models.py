@@ -13,5 +13,5 @@ class Image(Base):
     is_removed = Column(BOOLEAN, default=False)
     title = Column(String)
     file_url = Column(String)
-    show = relationship("Show", backref="cover_image",lazy="selectin", primaryjoin="Image.id == Show.image")
+    #show = relationship("Show", backref="cover_image",lazy="selectin", primaryjoin="Image.id == Show.image")
     episode = relationship("Episode", backref="image_val", lazy="selectin", primaryjoin="Image.id == Episode.cover_image")
