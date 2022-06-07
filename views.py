@@ -32,4 +32,4 @@ async def update_entity(entity_id: uuid.UUID, entity_class, entity_param, serial
 
 async def read_entity(entity_id: uuid.UUID, entity_class, serializer_class):
     entity = await get_view_entity(entity_id, entity_class)
-    return serialize(entity, serializer_class)
+    return entity

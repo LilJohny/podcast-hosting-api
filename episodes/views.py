@@ -6,7 +6,8 @@ from typing import Optional
 from fastapi import APIRouter, status, UploadFile, File, HTTPException
 from fastapi_pagination import paginate, Page
 
-from episodes.models import EpisodeParam, Episode, EpisodeResponse
+from episodes.models import Episode
+from episodes.schemas import EpisodeParam, EpisodeResponse
 from images.models import Image
 from images.views import create_image
 from models import str_uuid_factory

@@ -4,6 +4,7 @@ from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File
 from fastapi_pagination import Page, paginate, create_page
+from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import functions as sql_functions
 
 from episodes.models import Episode
@@ -12,7 +13,8 @@ from models import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
 from series.models import Series
 from series.views import create_series_batch
-from shows.models import ShowUpdate, Show, ShowResponse, ShowCreate
+from shows.models import Show
+from shows.schemas import ShowUpdate, ShowResponse, ShowCreate
 from users import User, current_active_user
 from utils.constants import GENERATOR_VERSION
 from utils.db import save_entity, get_entities, get_entity
@@ -64,7 +66,13 @@ async def create_show(show_create_param: ShowCreate,
     )
     await save_entity(show)
     await create_series_batch(show_id, series_param)
-    return ShowResponse(**show.dict(), series=series_param, selected_streamings=selected_streamings)
+
+    return ShowResponse(
+        **show.__dict__,
+        series=series_param,
+        selected_streamings=selected_streamings,
+        duration=show.duration,
+        episodes_number=show.episodes_number)
 
 
 @shows_router.get("/my", response_model=Page[ShowResponse])
@@ -124,26 +132,20 @@ async def list_all_shows(show_name: Optional[str] = None, featured: Optional[boo
 
 
 async def list_shows(conditions):
-    shows_episodes, total, params = await get_entities(
+    shows, total, params = await get_entities(
         Show,
         conditions,
-        additional_columns=[
-            sql_functions.count(Episode.id.distinct()),
-            sql_functions.coalesce(sql_functions.sum(Episode.duration), 0)
-        ],
-        join_models=[Episode],
+        opts=[selectinload(Show.series_arr), selectinload(Show.episodes)]
     )
-    series, total, params = await get_entities(Show, conditions, only_columns=[Show.id, sql_functions.array_agg(
-        Series.name.distinct()).label("series")], join_models=[Series])
-    shows = []
-    for show_fields in zip(shows_episodes, series):
-        shows.append(ShowResponse(
-            **show_fields[0][0].dict(),
-            episodes_number=show_fields[0][1],
-            duration=show_fields[0][2],
-            series=show_fields[1][1],
-            selected_streamings=from_streaming_options_db(shows_episodes[0][0].streaming_options)
-        ).dict()
-                     )
-    shows = create_page(shows, total, params)
-    return shows
+
+
+    shows = [
+        ShowResponse(
+            **show[0].__dict__,
+            duration=show[0].duration,
+            episodes_number=show[0].episodes_number,
+            series=[series.name for series in show[0].series_arr],
+            selected_streamings=show[0].selected_streamings,) for show in shows]
+
+    shows_page = create_page(shows, total, params)
+    return shows_page

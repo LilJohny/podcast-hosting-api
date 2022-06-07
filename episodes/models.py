@@ -1,39 +1,30 @@
-import datetime
-import enum
-import uuid as uuid_lib
+import uuid
 
-from sqladmin import ModelAdmin
-from sqlmodel import SQLModel, Field, Enum, Column
+from sqlalchemy import Column, DateTime, Integer, String, BOOLEAN, Enum, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
-from models import UUIDModel, DeletableModel
-
-
-class EpisodeType(str, enum.Enum):
-    full = "full"
+from episodes.schemas import EpisodeType
+from settings import Base
 
 
-class EpisodeParam(SQLModel):
-    title: str
-    description: str
-    episode_num: int
-    season_num: int
-    explicit: bool
-    episode_type: EpisodeType = Field(sa_column=Column(Enum(EpisodeType)))
-    show_id: uuid_lib.UUID = Field(default=None, foreign_key="show.id")
-    series: str = Field(default=None, nullable=True)
+class Episode(Base):
+    __tablename__ = "episode"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    is_removed = Column(BOOLEAN, default=False)
 
-
-class EpisodeBase(EpisodeParam):
-    file_link: str
-    episode_link: str
-    episode_guid: str
-    pub_date: datetime.datetime
-    duration: int
-
-
-class EpisodeResponse(EpisodeBase, UUIDModel):
-    cover_link: str
-
-
-class Episode(EpisodeBase, UUIDModel, DeletableModel, table=True):
-    cover_image: uuid_lib.UUID = Field(default=None, foreign_key="image.id")
+    title = Column(String)
+    description = Column(String)
+    episode_num = Column(Integer)
+    season_num = Column(Integer)
+    explicit = Column(BOOLEAN)
+    episode_type = Column(Enum(EpisodeType))
+    show_id = Column(UUID(as_uuid=True), ForeignKey("show.id"))
+    series = Column(String)
+    file_link = Column(String)
+    episode_link = Column(String)
+    episode_guid = Column(String)
+    pub_date = Column(DateTime)
+    duration = Column(Integer)
+    cover_image = Column(UUID(as_uuid=True), ForeignKey("image.id"))
+    show = relationship("Show", backref="episodes", lazy="selectin", primaryjoin="Episode.show_id == Show.id")

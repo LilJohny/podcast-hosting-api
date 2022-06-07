@@ -1,10 +1,17 @@
 import uuid
 
-from sqlmodel import Field
+from sqlalchemy import Column, String, BOOLEAN, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
-from models import UUIDModel
+from settings import Base
 
 
-class Series(UUIDModel, table=True):
-    name: str = Field(nullable=False)
-    show_id: uuid.UUID = Field(nullable=False, foreign_key="show.id")
+
+class Series(Base):
+    __tablename__="series"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    is_removed = Column(BOOLEAN, default=False)
+    name = Column(String)
+    show_id = Column(UUID(as_uuid=True), ForeignKey("show.id"))
+    show = relationship("Show", backref="series_arr",lazy="selectin", primaryjoin="Series.show_id == Show.id")
