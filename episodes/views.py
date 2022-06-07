@@ -82,6 +82,8 @@ async def list_episode(
                                                                             (Episode.series, series),
                                                                             (Episode.title, episode_title)
                                                                             ] if field_val is not None]
+    if episode_title:
+        conditions.append(Episode.title.ilike(f"%{episode_title}%"))
     episodes, total, param = await get_entities(
         Episode,
         conditions,

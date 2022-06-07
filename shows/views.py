@@ -91,7 +91,7 @@ async def list_my_shows(
     ]
 
     if show_name:
-        conditions.append(Show.title.ilike(show_name))
+        conditions.append(Show.title.ilike(f"%{show_name}%"))
 
     return await list_shows(conditions)
 
