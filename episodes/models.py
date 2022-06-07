@@ -19,7 +19,7 @@ class Episode(Base):
     season_num = Column(Integer)
     explicit = Column(BOOLEAN)
     episode_type = Column(Enum(EpisodeType))
-    show_id = Column(UUID(as_uuid=True), ForeignKey("show.id"))
+    show_id = Column(UUID(as_uuid=True), ForeignKey("show.id"),index=True)
     series = Column(String)
     file_link = Column(String)
     episode_link = Column(String)

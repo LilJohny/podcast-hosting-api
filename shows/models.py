@@ -23,7 +23,7 @@ class Show(Base):
     media_link = Column(String)
     generator = Column(String)
     featured = Column(BOOLEAN, default=False)
-    image = Column(UUID(as_uuid=True), ForeignKey("image.id"))
+    image = Column(String)
     is_locked = Column(BOOLEAN, default=True)
     owner = Column(UUID(as_uuid=True), ForeignKey("user.id"))
     last_build_date = Column(DateTime)

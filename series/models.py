@@ -13,5 +13,5 @@ class Series(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     is_removed = Column(BOOLEAN, default=False)
     name = Column(String)
-    show_id = Column(UUID(as_uuid=True), ForeignKey("show.id"))
+    show_id = Column(UUID(as_uuid=True), ForeignKey("show.id"), index=True)
     show = relationship("Show", backref="series_arr",lazy="selectin", primaryjoin="Series.show_id == Show.id")
