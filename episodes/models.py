@@ -1,20 +1,14 @@
-import uuid
-
 from sqlalchemy import Column, DateTime, Integer, String, BOOLEAN, Enum, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from episodes.schemas import EpisodeType
-from settings import BaseModel
+from models import UUIDModel, DescribedModel, DeletableModel
 
 
-class Episode(BaseModel):
+class Episode(UUIDModel, DeletableModel, DescribedModel):
     __tablename__ = "episode"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    is_removed = Column(BOOLEAN, default=False)
 
-    title = Column(String)
-    description = Column(String)
     episode_num = Column(Integer)
     season_num = Column(Integer)
     explicit = Column(BOOLEAN)

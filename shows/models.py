@@ -1,20 +1,15 @@
-import uuid
-
 from sqlalchemy import Column, String, DateTime, ForeignKey, BOOLEAN, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from settings import BaseModel
+from models import UUIDModel, DeletableModel, DescribedModel
 from shows.schemas import Category, Language
 from utils.streamings import from_streaming_options_db
 
 
-class Show(BaseModel):
+class Show(UUIDModel, DeletableModel, DescribedModel):
     __tablename__ = "show"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    is_removed = Column(BOOLEAN, default=False)
-    title = Column(String)
-    description = Column(String)
+
     language = Column(Enum(Language))
     show_copyright = Column(String)
     category = Column(Enum(Category))

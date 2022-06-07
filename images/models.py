@@ -1,16 +1,12 @@
-import uuid
-
-from sqlalchemy import Column, BOOLEAN, String
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from settings import BaseModel
+from models import UUIDModel, DeletableModel
 
 
-class Image(BaseModel):
+class Image(UUIDModel, DeletableModel):
     __tablename__ = "image"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    is_removed = Column(BOOLEAN, default=False)
+
     title = Column(String)
     file_url = Column(String)
     episode = relationship("Episode", backref="image_val", lazy="selectin", primaryjoin="Image.id == Episode.cover_image")

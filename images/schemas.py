@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 
-from schemas import UUIDModel
+from schemas import UUIDSchema
 
 
 class ImageCreate(BaseModel):
     title: str
 
 
-class ImageResponse(ImageCreate, UUIDModel):
+class ImageResponse(ImageCreate, UUIDSchema):
     file_url: str

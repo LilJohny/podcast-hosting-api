@@ -3,7 +3,7 @@ import uuid
 from typing import Set, List, Optional
 
 from pydantic import BaseModel
-from schemas import UUIDModel
+from schemas import UUIDSchema
 
 
 class Language(str, enum.Enum):
@@ -36,7 +36,7 @@ class ShowUpdate(BaseModel):
     series: Optional[Set[str]]
 
 
-class ShowResponse(ShowCreate, UUIDModel):
+class ShowResponse(ShowCreate, UUIDSchema):
     duration: int
     episodes_number: int
     series: Optional[List[str]]

@@ -4,7 +4,7 @@ import uuid
 
 from pydantic import BaseModel, Field
 
-from schemas import UUIDModel
+from schemas import UUIDSchema
 
 
 class EpisodeType(str, enum.Enum):
@@ -34,5 +34,5 @@ class EpisodeBase(EpisodeCreate):
     duration: int
 
 
-class EpisodeResponse(EpisodeBase, UUIDModel):
+class EpisodeResponse(EpisodeBase, UUIDSchema):
     cover_link: str
