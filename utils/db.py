@@ -1,5 +1,5 @@
 import uuid
-from typing import Type, Optional, List
+from typing import Type, Optional, List, Callable
 
 from utils.pagination import paginate
 from sqlalchemy.engine import Row
@@ -31,7 +31,8 @@ def prepare_base_select(
         only_columns: Optional[list] = None,
         join_models: Optional[List[Type[SQLModel]]] = None,
         additional_group_by_columns: Optional[list] = None,
-        opts:list=None
+        opts: list = None,
+        order_by: Optional[Callable] = None
 ):
     if not only_columns:
         base_select = select(entity, *additional_columns) if additional_columns else select(entity)
@@ -46,7 +47,9 @@ def prepare_base_select(
             base_select = base_select.options(opt)
     base_select = base_select.group_by(entity.id) if not additional_group_by_columns else base_select.group_by(
         entity.id, *additional_group_by_columns)
-    return base_select.order_by(entity.id)
+    if not order_by:
+        order_by = entity.id
+    return base_select.order_by(order_by)
 
 
 async def get_entity(
@@ -56,7 +59,7 @@ async def get_entity(
         only_columns: Optional[list] = None,
         join_models: Optional[List[Type[SQLModel]]] = None,
         additional_group_by_columns: Optional[list] = None,
-        opts:list=None,
+        opts: list = None,
 ) -> Row:
     async with async_session_maker() as session:
         async with session.begin():
@@ -75,12 +78,13 @@ async def get_entities(
         only_columns: Optional[list] = None,
         join_models: Optional[List[Type[SQLModel]]] = None,
         additional_group_by_columns: Optional[list] = None,
-        opts:list=None,
+        opts: list = None,
+        order_by: Optional[Callable] = None
 ) -> List[Row]:
     async with async_session_maker() as session:
         async with session.begin():
             base_select = prepare_base_select(entity, additional_columns, only_columns, join_models,
-                                              additional_group_by_columns, opts)
+                                              additional_group_by_columns, opts, order_by)
 
             query = base_select.filter(entity.is_removed == False)
             if conditions:

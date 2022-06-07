@@ -87,7 +87,8 @@ async def list_episode(
     episodes, total, param = await get_entities(
         Episode,
         conditions,
-        opts=[selectinload(Episode.image_val)]
+        opts=[selectinload(Episode.image_val)],
+        order_by=lambda :Episode.season_num*10+Episode.episode_num
     )
     episodes = [EpisodeResponse(
         **episode[0].__dict__,
