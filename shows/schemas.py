@@ -56,7 +56,7 @@ class ShowUpdate(SQLModel):
 #     streaming_options: str = Field(default="000000")
 
 
-class ShowResponse(ShowCreate):
+class ShowResponse(ShowCreate, UUIDModel):
     duration: int
     episodes_number: int
     series: Optional[List[str]]
