@@ -15,7 +15,7 @@ images_router = APIRouter(prefix="/images")
 @images_router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_image(image_title: str, image_file: UploadFile = File(...)) -> ImageResponse:
     image_s3_key = get_s3_key(image_file.filename, image_title)
-    image_url = await upload_file_to_s3(image_s3_key, image_file.file.read(), FileKind.IMAGE)
+    image_url = await upload_file_to_s3(image_s3_key, image_file.file, FileKind.IMAGE)
     image = Image(title=image_title, file_url=image_url)
     await save_entity(image)
     return image.__dict__

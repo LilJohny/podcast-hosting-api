@@ -26,7 +26,7 @@ async def create_episode(episode_param: EpisodeCreate,
                          image_file: UploadFile = File(...)) -> EpisodeResponse:
     image = await create_image(image_title, image_file)
     image_s3_key = get_s3_key(episode_file.filename, episode_param.title)
-    episode_link = await upload_file_to_s3(image_s3_key, episode_file.file.read(),
+    episode_link = await upload_file_to_s3(image_s3_key, episode_file.file,
                                            FileKind.AUDIO)
     episode_id = str_uuid_factory()
     _, file_extension = os.path.splitext(episode_file.filename)
