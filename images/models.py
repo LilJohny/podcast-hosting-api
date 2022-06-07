@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy import Column, BOOLEAN, String
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from settings import Base
 
@@ -12,3 +13,4 @@ class Image(Base):
     is_removed = Column(BOOLEAN, default=False)
     title = Column(String)
     file_url = Column(String)
+    show = relationship("Show", backref="cover_image",lazy="selectin", primaryjoin="Image.id == Show.image")
