@@ -145,8 +145,7 @@ async def list_shows(conditions):
         conditions,
         opts=[
             selectinload(Show.series_arr),
-            selectinload(Show.episodes),
-            selectinload(Show.cover_image)
+            selectinload(Show.episodes)
         ]
     )
 
@@ -157,8 +156,7 @@ async def list_shows(conditions):
             duration=show[0].duration,
             episodes_number=show[0].episodes_number,
             series=[series.name for series in show[0].series_arr],
-            selected_streamings=show[0].selected_streamings,
-            cover_link=show[0].cover_image.file_url
+            selected_streamings=show[0].selected_streamings
         ) for show in shows]
 
     shows_page = create_page(shows, total, params)

@@ -1,16 +1,9 @@
-import datetime
 import enum
-import uuid
-import uuid as uuid_lib
 from typing import Set, List, Optional
 
-import sqlalchemy
-from sqlalchemy import String, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID, BOOLEAN
 from sqlmodel import SQLModel, Field, Enum, Column
-from models import DeletableModel, UUIDModel
-from settings import Base
-from users.db import User
+
+from models import UUIDModel
 
 
 class Language(str, enum.Enum):
@@ -61,4 +54,4 @@ class ShowResponse(ShowCreate, UUIDModel):
     episodes_number: int
     series: Optional[List[str]]
     selected_streamings: List[str]
-    cover_link:str
+    image: str
