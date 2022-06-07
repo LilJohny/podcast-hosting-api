@@ -61,3 +61,4 @@ class ShowResponse(ShowCreate, UUIDModel):
     episodes_number: int
     series: Optional[List[str]]
     selected_streamings: List[str]
+    cover_link:str
