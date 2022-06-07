@@ -15,7 +15,7 @@ from shows.models import Show
 from shows.schemas import ShowUpdate, ShowResponse, ShowCreate
 from users import User, current_active_user
 from utils.constants import GENERATOR_VERSION
-from utils.db import save_entity, get_entities, get_entity
+from utils.db import save_entity, get_entities_paginated, get_entity
 from utils.files import upload_file_to_s3, FileKind
 from utils.streamings import to_streaming_options_db
 from views import delete_entity, update_entity
@@ -113,7 +113,6 @@ async def read_show(show_id: uuid.UUID) -> ShowResponse:
         opts=[
             selectinload(Show.series_arr),
             selectinload(Show.episodes),
-            #selectinload(Show.cover_image)
         ]
     )
     return ShowResponse(
@@ -137,7 +136,7 @@ async def list_all_shows(show_name: Optional[str] = None, featured: Optional[boo
 
 
 async def list_shows(conditions):
-    shows, total, params = await get_entities(
+    shows, total, params = await get_entities_paginated(
         Show,
         conditions,
         opts=[

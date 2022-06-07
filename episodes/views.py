@@ -12,7 +12,7 @@ from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate
 from images.views import create_image
 from schemas import str_uuid_factory
 from utils.audio import DURATION_FINDERS
-from utils.db import save_entity, get_entities, get_entity
+from utils.db import save_entity, get_entities_paginated, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
 from views import delete_entity, update_entity
 
@@ -84,11 +84,11 @@ async def list_episode(
                                                                             ] if field_val is not None]
     if episode_title:
         conditions.append(Episode.title.ilike(f"%{episode_title}%"))
-    episodes, total, param = await get_entities(
+    episodes, total, param = await get_entities_paginated(
         Episode,
         conditions,
         opts=[selectinload(Episode.image_val)],
-        order_by=lambda :Episode.season_num*10+Episode.episode_num
+        order_by=lambda: Episode.season_num*10+Episode.episode_num
     )
     episodes = [EpisodeResponse(
         **episode[0].__dict__,

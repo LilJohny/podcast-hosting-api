@@ -1,12 +1,12 @@
 import uuid
 from typing import Type, Optional, List, Callable
 
-from utils.pagination import paginate
-from sqlalchemy.engine import Row
+from fastapi_pagination import Page
 from sqlalchemy.future import select
 from sqlalchemy.sql.elements import BinaryExpression
 
 from settings import async_session_maker, BaseModel
+from utils.pagination import paginate
 
 
 async def save_entities(entities: List[BaseModel]):
@@ -25,22 +25,13 @@ async def save_entity(entity: BaseModel):
 
 
 def prepare_base_select(
-        entity: Optional[Type[BaseModel]] = None,
-        additional_columns: Optional[list] = None,
-        only_columns: Optional[list] = None,
-        join_models: Optional[List[Type[BaseModel]]] = None,
+        entity: Type[BaseModel],
         additional_group_by_columns: Optional[list] = None,
-        opts: list = None,
+        opts: Optional[list] = None,
         order_by: Optional[Callable] = None
 ):
-    if not only_columns:
-        base_select = select(entity, *additional_columns) if additional_columns else select(entity)
-    else:
-        base_select = select(*only_columns)
+    base_select = select(entity)
 
-    if join_models:
-        for join_model in join_models:
-            base_select = base_select.join(join_model, isouter=True)
     if opts:
         for opt in opts:
             base_select = base_select.options(opt)
@@ -48,42 +39,33 @@ def prepare_base_select(
         entity.id, *additional_group_by_columns)
     if not order_by:
         order_by = entity.id
-    return base_select.order_by(order_by)
+    return base_select.order_by(order_by) if order_by else base_select.order_by(entity.id)
 
 
 async def get_entity(
         entity_id: uuid.UUID,
         entity: Optional[Type[BaseModel]] = None,
-        additional_columns: Optional[list] = None,
-        only_columns: Optional[list] = None,
-        join_models: Optional[List[Type[BaseModel]]] = None,
-        additional_group_by_columns: Optional[list] = None,
         opts: list = None,
-) -> Row:
+) -> BaseModel:
     async with async_session_maker() as session:
         async with session.begin():
-            base_select = prepare_base_select(entity, additional_columns, only_columns, join_models,
-                                              additional_group_by_columns, opts)
+            base_select = prepare_base_select(entity, opts=opts)
             result = await session.execute(
                 base_select.filter(entity.id == entity_id).filter(entity.is_removed == False))
             item = result.first()
     return item[0]
 
 
-async def get_entities(
+async def get_entities_paginated(
         entity: Type[BaseModel],
         conditions: Optional[List[BinaryExpression]] = None,
-        additional_columns: Optional[list] = None,
-        only_columns: Optional[list] = None,
-        join_models: Optional[List[Type[BaseModel]]] = None,
         additional_group_by_columns: Optional[list] = None,
         opts: list = None,
         order_by: Optional[Callable] = None
-) -> List[Row]:
+) -> Page:
     async with async_session_maker() as session:
         async with session.begin():
-            base_select = prepare_base_select(entity, additional_columns, only_columns, join_models,
-                                              additional_group_by_columns, opts, order_by)
+            base_select = prepare_base_select(entity, additional_group_by_columns, opts, order_by)
 
             query = base_select.filter(entity.is_removed == False)
             if conditions:

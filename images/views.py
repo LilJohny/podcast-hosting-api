@@ -5,7 +5,7 @@ from fastapi_pagination import Page, create_page
 
 from images.models import Image
 from images.schemas import ImageResponse
-from utils.db import save_entity, get_entities
+from utils.db import save_entity, get_entities_paginated
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
 from views import delete_entity, read_entity
 
@@ -34,6 +34,6 @@ async def read_image(image_id: uuid.UUID) -> ImageResponse:
 
 @images_router.get("/", response_model=Page[ImageResponse])
 async def list_images():
-    images, total, params = await get_entities(Image)
+    images, total, params = await get_entities_paginated(Image)
     images = [ImageResponse(**image[0].__dict__) for image in images]
     return create_page(images, total, params)
