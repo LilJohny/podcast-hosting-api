@@ -5,6 +5,7 @@ from typing import Optional
 
 from fastapi import APIRouter, status, UploadFile, File, HTTPException
 from fastapi_pagination import paginate, Page
+from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
 from episodes.schemas import EpisodeParam, EpisodeResponse
@@ -63,11 +64,12 @@ async def read_episode(episode_id: uuid.UUID) -> EpisodeResponse:
     episode = await get_entity(
         episode_id,
         Episode,
-        additional_columns=[Image.file_url],
-        join_models=[Image],
-        additional_group_by_columns=[Image.file_url]
+        opts=[selectinload(Episode.image_val)]
     )
-    return EpisodeResponse(**episode[0].dict(), cover_link=episode[1])
+    return EpisodeResponse(
+        **episode.__dict__,
+        cover_link=episode.image_val.file_url
+    )
 
 
 @episodes_router.get("/", response_model=Page[EpisodeResponse])
@@ -83,14 +85,10 @@ async def list_episode(
     episodes = await get_entities(
         Episode,
         conditions,
-        additional_columns=[
-            Image.file_url
-        ],
-        join_models=[Image],
-        additional_group_by_columns=[Image.file_url]
+        opts=[selectinload(Episode.image_val)]
     )
     episodes = [EpisodeResponse(
-        **episode[0].dict(),
-        cover_link=episode[1]
+        **episode.__dict__,
+        cover_link=episode.image_val.file_url
     ) for episode in episodes]
     return paginate(episodes)
