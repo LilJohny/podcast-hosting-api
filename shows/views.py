@@ -115,7 +115,7 @@ async def read_show(show_id: uuid.UUID) -> ShowResponse:
         opts=[
             selectinload(Show.series_arr),
             selectinload(Show.episodes),
-            selectinload(Show.cover_image)
+            #selectinload(Show.cover_image)
         ]
     )
     return ShowResponse(
@@ -123,8 +123,7 @@ async def read_show(show_id: uuid.UUID) -> ShowResponse:
         duration=show.duration,
         episodes_number=show.episodes_number,
         series=[series.name for series in show.series_arr],
-        selected_streamings=show.selected_streamings,
-        cover_link=show.cover_image.file_url
+        selected_streamings=show.selected_streamings
     )
 
 
