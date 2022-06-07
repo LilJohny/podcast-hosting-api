@@ -14,3 +14,4 @@ class Image(Base):
     title = Column(String)
     file_url = Column(String)
     show = relationship("Show", backref="cover_image",lazy="selectin", primaryjoin="Image.id == Show.image")
+    episode = relationship("Episode", backref="image_val", lazy="selectin", primaryjoin="Image.id == Episode.cover_image")
