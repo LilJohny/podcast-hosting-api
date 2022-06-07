@@ -55,7 +55,6 @@ sniffio==1.2.0
 sqladmin==0.1.9
 SQLAlchemy==1.4.37
 sqlalchemy2-stubs==0.0.2a22
-sqlmodel==0.0.4
 starlette==0.17.1
 typing_extensions==4.1.1
 urllib3==1.26.9

@@ -4,10 +4,10 @@ from sqladmin import ModelAdmin
 from sqlalchemy import String, Column
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from settings import Base, get_async_session
+from settings import BaseModel, get_async_session
 
 
-class User(SQLAlchemyBaseUserTableUUID, Base):
+class User(SQLAlchemyBaseUserTableUUID, BaseModel):
     first_name = Column(String)
     last_name = Column(String)
 

@@ -7,7 +7,6 @@ Create Date: 2022-06-07 04:16:06.949137
 """
 from alembic import op
 import sqlalchemy as sa
-import sqlmodel
 import fastapi_users_db_sqlalchemy
 from sqlalchemy.dialects import postgresql
 

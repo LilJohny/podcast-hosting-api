@@ -5,7 +5,6 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import AsyncEngine
-from sqlmodel import SQLModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -21,13 +20,13 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from settings import Base
+from settings import BaseModel
 from episodes.models import Episode
 from series.models import Series
 from shows.models import Show
 from images.models import Image
 
-target_metadata = SQLModel.metadata, Base.metadata
+target_metadata = BaseModel.metadata
 
 
 # other values from the config, defined by the needs of env.py,

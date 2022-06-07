@@ -5,10 +5,10 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from episodes.schemas import EpisodeType
-from settings import Base
+from settings import BaseModel
 
 
-class Episode(Base):
+class Episode(BaseModel):
     __tablename__ = "episode"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     is_removed = Column(BOOLEAN, default=False)
@@ -19,7 +19,7 @@ class Episode(Base):
     season_num = Column(Integer)
     explicit = Column(BOOLEAN)
     episode_type = Column(Enum(EpisodeType))
-    show_id = Column(UUID(as_uuid=True), ForeignKey("show.id"),index=True)
+    show_id = Column(UUID(as_uuid=True), ForeignKey("show.id"), index=True)
     series = Column(String)
     file_link = Column(String)
     episode_link = Column(String)

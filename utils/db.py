@@ -5,12 +5,11 @@ from utils.pagination import paginate
 from sqlalchemy.engine import Row
 from sqlalchemy.future import select
 from sqlalchemy.sql.elements import BinaryExpression
-from sqlmodel import SQLModel
 
-from settings import async_session_maker
+from settings import async_session_maker, BaseModel
 
 
-async def save_entities(entities: List[SQLModel]):
+async def save_entities(entities: List[BaseModel]):
     async with async_session_maker() as session:
         async with session.begin():
             for entity in entities:
@@ -18,7 +17,7 @@ async def save_entities(entities: List[SQLModel]):
         await session.commit()
 
 
-async def save_entity(entity: SQLModel):
+async def save_entity(entity: BaseModel):
     async with async_session_maker() as session:
         async with session.begin():
             session.add(entity)
@@ -26,10 +25,10 @@ async def save_entity(entity: SQLModel):
 
 
 def prepare_base_select(
-        entity: Optional[Type[SQLModel]] = None,
+        entity: Optional[Type[BaseModel]] = None,
         additional_columns: Optional[list] = None,
         only_columns: Optional[list] = None,
-        join_models: Optional[List[Type[SQLModel]]] = None,
+        join_models: Optional[List[Type[BaseModel]]] = None,
         additional_group_by_columns: Optional[list] = None,
         opts: list = None,
         order_by: Optional[Callable] = None
@@ -54,10 +53,10 @@ def prepare_base_select(
 
 async def get_entity(
         entity_id: uuid.UUID,
-        entity: Optional[Type[SQLModel]] = None,
+        entity: Optional[Type[BaseModel]] = None,
         additional_columns: Optional[list] = None,
         only_columns: Optional[list] = None,
-        join_models: Optional[List[Type[SQLModel]]] = None,
+        join_models: Optional[List[Type[BaseModel]]] = None,
         additional_group_by_columns: Optional[list] = None,
         opts: list = None,
 ) -> Row:
@@ -72,11 +71,11 @@ async def get_entity(
 
 
 async def get_entities(
-        entity: Type[SQLModel],
+        entity: Type[BaseModel],
         conditions: Optional[List[BinaryExpression]] = None,
         additional_columns: Optional[list] = None,
         only_columns: Optional[list] = None,
-        join_models: Optional[List[Type[SQLModel]]] = None,
+        join_models: Optional[List[Type[BaseModel]]] = None,
         additional_group_by_columns: Optional[list] = None,
         opts: list = None,
         order_by: Optional[Callable] = None

@@ -3,14 +3,13 @@ import uuid
 from sqlalchemy import Column, String, DateTime, ForeignKey, BOOLEAN, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
 
-from settings import Base
+from settings import BaseModel
 from shows.schemas import Category, Language
 from utils.streamings import from_streaming_options_db
 
 
-class Show(Base):
+class Show(BaseModel):
     __tablename__ = "show"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     is_removed = Column(BOOLEAN, default=False)
@@ -23,7 +22,7 @@ class Show(Base):
     media_link = Column(String)
     generator = Column(String)
     featured = Column(BOOLEAN, default=False)
-    image = Column(String)
+    image = Column(UUID(as_uuid=True), ForeignKey("image.id"))
     is_locked = Column(BOOLEAN, default=True)
     owner = Column(UUID(as_uuid=True), ForeignKey("user.id"))
     last_build_date = Column(DateTime)

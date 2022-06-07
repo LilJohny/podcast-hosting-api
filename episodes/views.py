@@ -8,21 +8,19 @@ from fastapi_pagination import Page, create_page
 from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
-from episodes.schemas import EpisodeParam, EpisodeResponse
-from images.models import Image
+from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate
 from images.views import create_image
-from models import str_uuid_factory
+from schemas import str_uuid_factory
 from utils.audio import DURATION_FINDERS
 from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
-from utils.serializers import serialize
-from views import delete_entity, update_entity, read_entity
+from views import delete_entity, update_entity
 
 episodes_router = APIRouter(prefix="/episodes")
 
 
 @episodes_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_episode(episode_param: EpisodeParam,
+async def create_episode(episode_param: EpisodeCreate,
                          image_title: str,
                          episode_file: UploadFile = File(...),
                          image_file: UploadFile = File(...)) -> EpisodeResponse:
@@ -46,7 +44,10 @@ async def create_episode(episode_param: EpisodeParam,
                       duration=episode_duration
                       )
     await save_entity(episode)
-    return serialize(episode, EpisodeResponse)
+    return EpisodeResponse(
+        **episode.__dict__,
+        cover_link=image.file_url
+    )
 
 
 @episodes_router.delete("/{episode_id}", status_code=status.HTTP_202_ACCEPTED)
@@ -55,7 +56,7 @@ async def delete_episode(episode_id: uuid.UUID):
 
 
 @episodes_router.put("/{episode_id}", status_code=status.HTTP_200_OK)
-async def update_episode(episode_id: uuid.UUID, episode_param: EpisodeParam) -> EpisodeResponse:
+async def update_episode(episode_id: uuid.UUID, episode_param: EpisodeUpdate) -> EpisodeResponse:
     return await update_entity(episode_id, Episode, episode_param, EpisodeResponse)
 
 
@@ -80,7 +81,6 @@ async def list_episode(
 ) -> Page[EpisodeResponse]:
     conditions = [(model_field == field_val) for model_field, field_val in [(Episode.show_id, show_id),
                                                                             (Episode.series, series),
-                                                                            (Episode.title, episode_title)
                                                                             ] if field_val is not None]
     if episode_title:
         conditions.append(Episode.title.ilike(f"%{episode_title}%"))

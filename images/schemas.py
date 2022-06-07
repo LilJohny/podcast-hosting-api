@@ -1,23 +1,11 @@
-import uuid
+from pydantic import BaseModel
 
-from sqladmin import ModelAdmin
-from sqlalchemy import Column, BOOLEAN, String
-from sqlalchemy.dialects.postgresql import UUID
-from sqlmodel import SQLModel
-
-from models import UUIDModel, DeletableModel
-from settings import Base
+from schemas import UUIDModel
 
 
-class ImageParam(SQLModel):
+class ImageCreate(BaseModel):
     title: str
 
 
-class ImageResponse(ImageParam, UUIDModel):
+class ImageResponse(ImageCreate, UUIDModel):
     file_url: str
-
-
-# class Image(ImageResponse, DeletableModel, table=True):
-#     pass
-
-

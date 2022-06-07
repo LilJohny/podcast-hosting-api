@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASE_URL = DATABASE_URL.replace('postgres', 'postgresql+asyncpg')
-Base = declarative_base()
+BaseModel = declarative_base()
 ENGINE = create_async_engine(DATABASE_URL)
 BUCKET_NAME = os.getenv("BUCKETEER_BUCKET_NAME")
 AWS_ACCESS_KEY_ID = os.getenv("BUCKETEER_AWS_ACCESS_KEY_ID")
@@ -37,4 +37,4 @@ async_session_maker = sessionmaker(ENGINE, class_=AsyncSession, expire_on_commit
 
 async def create_db_and_tables():
     async with ENGINE.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(BaseModel.metadata.create_all)
