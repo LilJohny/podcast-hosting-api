@@ -88,7 +88,7 @@ async def list_episode(
         opts=[selectinload(Episode.image_val)]
     )
     episodes = [EpisodeResponse(
-        **episode.__dict__,
-        cover_link=episode.image_val.file_url
+        **episode[0].__dict__,
+        cover_link=episode[0].image_val.file_url
     ) for episode in episodes]
     return paginate(episodes)
