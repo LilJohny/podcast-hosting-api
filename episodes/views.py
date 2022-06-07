@@ -4,7 +4,7 @@ import uuid
 from typing import Optional
 
 from fastapi import APIRouter, status, UploadFile, File, HTTPException
-from fastapi_pagination import paginate, Page
+from fastapi_pagination import Page, create_page
 from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
@@ -82,7 +82,7 @@ async def list_episode(
                                                                             (Episode.series, series),
                                                                             (Episode.title, episode_title)
                                                                             ] if field_val is not None]
-    episodes = await get_entities(
+    episodes, total, param = await get_entities(
         Episode,
         conditions,
         opts=[selectinload(Episode.image_val)]
@@ -91,4 +91,4 @@ async def list_episode(
         **episode[0].__dict__,
         cover_link=episode[0].image_val.file_url
     ) for episode in episodes]
-    return paginate(episodes)
+    return create_page(episodes, total, param)
