@@ -1,16 +1,14 @@
-from sqladmin import ModelAdmin
-from sqlmodel import SQLModel
+import uuid
 
-from models import UUIDModel, DeletableModel
+from sqlalchemy import Column, BOOLEAN, String
+from sqlalchemy.dialects.postgresql import UUID
 
-
-class ImageParam(SQLModel):
-    title: str
+from settings import Base
 
 
-class ImageResponse(ImageParam, UUIDModel):
-    file_url: str
-
-
-class Image(ImageResponse, DeletableModel, table=True):
-    pass
+class Image(Base):
+    __tablename__ = "image"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    is_removed = Column(BOOLEAN, default=False)
+    title = Column(String)
+    file_url = Column(String)
