@@ -104,7 +104,7 @@ async def delete_show(show_id: uuid.UUID):
 async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowResponse:
     show_param_data = {key: show_param.dict()[key] for key in show_param.dict() if show_param.dict()[key]}
 
-    series_param = show_param_data.pop("series", None)
+    series_param = sorted(show_param_data.pop("series", None))
     show = await get_view_entity(show_id, Show, opts=[selectinload(Show.series_arr), selectinload(Show.episodes)])
     if series_param:
 
@@ -122,7 +122,7 @@ async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowRespons
         **show.__dict__,
         duration=show.duration,
         episodes_number=show.episodes_number,
-        series=[series.name for series in show.series_arr] if not series_param else series_param,
+        series=show.series_names if not series_param else series_param,
         selected_streamings=show.selected_streamings
     )
 
@@ -141,7 +141,7 @@ async def read_show(show_id: uuid.UUID) -> ShowResponse:
         **show.__dict__,
         duration=show.duration,
         episodes_number=show.episodes_number,
-        series=[series.name for series in show.series_arr],
+        series=show.series_names,
         selected_streamings=show.selected_streamings
     )
 
@@ -167,13 +167,12 @@ async def list_shows(conditions):
         ]
     )
 
-
     shows = [
         ShowResponse(
             **show[0].__dict__,
             duration=show[0].duration,
             episodes_number=show[0].episodes_number,
-            series=[series.name for series in show[0].series_arr],
+            series=show[0].series_names,
             selected_streamings=show[0].selected_streamings
         ) for show in shows]
 

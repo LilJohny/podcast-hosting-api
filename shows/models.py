@@ -35,3 +35,7 @@ class Show(UUIDModel, DeletableModel, DescribedModel):
     @hybrid_property
     def selected_streamings(self):
         return from_streaming_options_db(self.streaming_options)
+
+    @hybrid_property
+    def series_names(self):
+        return sorted([series.name for series in self.series_arr])
