@@ -57,8 +57,6 @@ async def create_show(show_create_param: ShowCreate,
         image=image.id,
         show_link=show_link,
         media_link=image.file_url,
-        last_build_date=datetime.datetime.utcnow().replace(tzinfo=None),
-        generator=GENERATOR_VERSION,
         owner=user.id,
         feed_file_link=feed_file_link,
         streaming_options=to_streaming_options_db(selected_streamings)
@@ -119,8 +117,6 @@ async def update_show(
 
         series_to_create = [series_new for series_new in series_param if series_new not in show.series_names]
         await create_series_batch(show.id, series_to_create)
-
-    show_param_data["last_build_date"] = datetime.datetime.utcnow().replace(tzinfo=None)
 
     show = await update_entity(show_id, Show, show_param_data, ShowResponse, entity_instance=show)
     return ShowResponse(

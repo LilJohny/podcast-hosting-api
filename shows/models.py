@@ -1,10 +1,17 @@
+import datetime
+
 from sqlalchemy import Column, String, DateTime, ForeignKey, BOOLEAN, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from models import UUIDModel, DeletableModel, DescribedModel
 from shows.schemas import Category, Language
+from utils.constants import GENERATOR_VERSION
 from utils.streamings import from_streaming_options_db
+
+
+def datetime_now_no_tz():
+    return datetime.datetime.utcnow().replace(tzinfo=None)
 
 
 class Show(UUIDModel, DeletableModel, DescribedModel):
@@ -15,12 +22,12 @@ class Show(UUIDModel, DeletableModel, DescribedModel):
     category = Column(Enum(Category))
     show_link = Column(String)
     media_link = Column(String)
-    generator = Column(String)
+    generator = Column(String, default=GENERATOR_VERSION)
     featured = Column(BOOLEAN, default=False)
     image = Column(UUID(as_uuid=True), ForeignKey("image.id"), index=True)
     is_locked = Column(BOOLEAN, default=True)
     owner = Column(UUID(as_uuid=True), ForeignKey("user.id"), index=True)
-    last_build_date = Column(DateTime)
+    last_build_date = Column(DateTime, default=datetime_now_no_tz, onupdate=datetime_now_no_tz)
     feed_file_link = Column(String)
     streaming_options = Column(String, default="000000")
 
