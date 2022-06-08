@@ -3,7 +3,7 @@ import uuid
 from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File
-from fastapi_pagination import Page, paginate, create_page
+from fastapi_pagination import Page, create_page
 from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
@@ -96,18 +96,24 @@ async def list_my_shows(
 
 
 @shows_router.delete("/{show_id}")
-async def delete_show(show_id: uuid.UUID):
+async def delete_show(
+        show_id: uuid.UUID,
+        user: User = Depends(current_active_user)
+):
     return await delete_entity(show_id, Show)
 
 
 @shows_router.put("/{show_id}")
-async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowResponse:
+async def update_show(
+        show_id: uuid.UUID,
+        show_param: ShowUpdate,
+        user: User = Depends(current_active_user)
+) -> ShowResponse:
     show_param_data = {key: show_param.dict()[key] for key in show_param.dict() if show_param.dict()[key]}
 
     series_param = sorted(show_param_data.pop("series", None))
     show = await get_view_entity(show_id, Show, opts=[selectinload(Show.series_arr), selectinload(Show.episodes)])
     if series_param:
-
         absent_series = [series.id for series in show.series_arr if series.name not in series_param]
         await delete_entities_permanent(absent_series, Series)
 
@@ -115,8 +121,8 @@ async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowRespons
         await create_series_batch(show.id, series_to_create)
 
     show_param_data["last_build_date"] = datetime.datetime.utcnow().replace(tzinfo=None)
-    show = await update_entity(show_id, Show, show_param_data, ShowResponse, entity_instance=show)
 
+    show = await update_entity(show_id, Show, show_param_data, ShowResponse, entity_instance=show)
     return ShowResponse(
         **show.__dict__,
         duration=show.duration,
@@ -127,7 +133,10 @@ async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowRespons
 
 
 @shows_router.get("/{show_id}")
-async def read_show(show_id: uuid.UUID) -> ShowResponse:
+async def read_show(
+        show_id: uuid.UUID,
+        user: User = Depends(current_active_user)
+) -> ShowResponse:
     show = await get_entity(
         show_id,
         Show,
@@ -152,8 +161,7 @@ async def list_all_shows(show_name: Optional[str] = None, featured: Optional[boo
         conditions.append(Show.featured == featured)
     if show_name:
         conditions.append(Show.title.ilike(show_name))
-    shows = await list_shows(conditions)
-    return paginate(shows)
+    return await list_shows(conditions)
 
 
 async def list_shows(conditions):
