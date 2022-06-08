@@ -1,6 +1,7 @@
 import uuid
 from typing import Type, Optional, List, Callable
 
+import sqlalchemy
 from fastapi_pagination import Page
 from sqlalchemy.future import select
 from sqlalchemy.sql.elements import BinaryExpression
@@ -74,3 +75,13 @@ async def get_entities_paginated(
             result = await paginate(session, query)
 
     return result
+
+
+async def delete_entity_permanent(
+        entity_id: uuid.UUID,
+        entity: Optional[Type[BaseModel]] = None
+):
+    async with async_session_maker() as session:
+        async with session.begin():
+            await session.execute(sqlalchemy.delete(entity).where(entity.id==entity_id))
+            await session.commit()
