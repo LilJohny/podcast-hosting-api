@@ -57,7 +57,8 @@ async def delete_episode(episode_id: uuid.UUID):
 
 @episodes_router.put("/{episode_id}", status_code=status.HTTP_200_OK)
 async def update_episode(episode_id: uuid.UUID, episode_param: EpisodeUpdate) -> EpisodeResponse:
-    return await update_entity(episode_id, Episode, episode_param, EpisodeResponse)
+    episode_param_data = {key: episode_param.dict()[key] for key in episode_param.dict() if episode_param.dict()[key]}
+    return await update_entity(episode_id, Episode, episode_param_data, EpisodeResponse)
 
 
 @episodes_router.get("/{episode_id}")
