@@ -10,15 +10,16 @@ from episodes.models import Episode
 from images.views import create_image
 from schemas import str_uuid_factory
 from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
+from series.models import Series
 from series.views import create_series_batch
 from shows.models import Show
 from shows.schemas import ShowUpdate, ShowResponse, ShowCreate
 from users import User, current_active_user
 from utils.constants import GENERATOR_VERSION
-from utils.db import save_entity, get_entities_paginated, get_entity
+from utils.db import save_entity, get_entities_paginated, get_entity, delete_entities_permanent
 from utils.files import upload_file_to_s3, FileKind
 from utils.streamings import to_streaming_options_db
-from views import delete_entity, update_entity
+from views import delete_entity, update_entity, get_view_entity
 
 shows_router = APIRouter(prefix="/shows")
 
@@ -104,22 +105,18 @@ async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowRespons
     show_param_data = {key: show_param.dict()[key] for key in show_param.dict() if show_param.dict()[key]}
 
     series_param = show_param_data.pop("series", None)
-    show = None
+    show = await get_view_entity(show_id, Show, opts=[selectinload(Show.series_arr), selectinload(Show.episodes)])
     if series_param:
-        show = await get_view_entity(show_id, Show, opts=[selectinload(Show.series_arr), selectinload(Show.episodes)])
 
-        for series in show.series_arr:
-            if series.name not in series_param:
-                await delete_entity_permanent(series.id, Series)
+        absent_series = [series.id for series in show.series_arr if series.name not in series_param]
+        await delete_entities_permanent(absent_series, Series)
 
         actual_series = [series.name for series in show.series_arr]
-
         series_to_create = [series_new for series_new in series_param if series_new not in actual_series]
         await create_series_batch(show.id, series_to_create)
 
     show_param_data["last_build_date"] = datetime.datetime.utcnow().replace(tzinfo=None)
-    show = await update_entity(show_id, Show, show_param_data, ShowResponse, entity_instance=show,
-                               opts=[selectinload(Show.series_arr), selectinload(Show.episodes)])
+    show = await update_entity(show_id, Show, show_param_data, ShowResponse, entity_instance=show)
 
     return ShowResponse(
         **show.__dict__,

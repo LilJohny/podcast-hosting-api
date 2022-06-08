@@ -45,8 +45,8 @@ def prepare_base_select(
 
 async def get_entity(
         entity_id: uuid.UUID,
-        entity: Optional[Type[BaseModel]] = None,
-        opts: list = None,
+        entity: Type[BaseModel],
+        opts: Optional[list] = None,
 ) -> BaseModel:
     async with async_session_maker() as session:
         async with session.begin():
@@ -79,9 +79,19 @@ async def get_entities_paginated(
 
 async def delete_entity_permanent(
         entity_id: uuid.UUID,
-        entity: Optional[Type[BaseModel]] = None
+        entity: Type[BaseModel]
 ):
     async with async_session_maker() as session:
         async with session.begin():
             await session.execute(sqlalchemy.delete(entity).where(entity.id==entity_id))
+            await session.commit()
+
+
+async def delete_entities_permanent(
+        entity_ids: List[uuid.UUID],
+        entity: Type[BaseModel]
+):
+    async with async_session_maker() as session:
+        async with session.begin():
+            await session.execute(sqlalchemy.delete(entity).where(entity.id.in_(entity_ids)))
             await session.commit()
