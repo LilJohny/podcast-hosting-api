@@ -42,3 +42,4 @@ class ShowResponse(ShowCreate, UUIDSchema):
     series: Optional[List[str]]
     selected_streamings: List[str]
     image: uuid.UUID
+    media_link: str
