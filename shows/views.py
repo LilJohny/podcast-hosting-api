@@ -101,8 +101,33 @@ async def delete_show(show_id: uuid.UUID):
 
 @shows_router.put("/{show_id}")
 async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowResponse:
-    show_param.last_build_date = show_param.last_build_date.replace(tzinfo=None)
-    return await update_entity(show_id, Show, show_param, ShowResponse)
+    show_param_data = {key: show_param.dict()[key] for key in show_param.dict() if show_param.dict()[key]}
+
+    series_param = show_param_data.pop("series", None)
+    show = None
+    if series_param:
+        show = await get_view_entity(show_id, Show, opts=[selectinload(Show.series_arr), selectinload(Show.episodes)])
+
+        for series in show.series_arr:
+            if series.name not in series_param:
+                await delete_entity_permanent(series.id, Series)
+
+        actual_series = [series.name for series in show.series_arr]
+
+        series_to_create = [series_new for series_new in series_param if series_new not in actual_series]
+        await create_series_batch(show.id, series_to_create)
+
+    show_param_data["last_build_date"] = datetime.datetime.utcnow().replace(tzinfo=None)
+    show = await update_entity(show_id, Show, show_param_data, ShowResponse, entity_instance=show,
+                               opts=[selectinload(Show.series_arr), selectinload(Show.episodes)])
+
+    return ShowResponse(
+        **show.__dict__,
+        duration=show.duration,
+        episodes_number=show.episodes_number,
+        series=[series.name for series in show.series_arr] if not series_param else series_param,
+        selected_streamings=show.selected_streamings
+    )
 
 
 @shows_router.get("/{show_id}")
