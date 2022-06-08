@@ -10,4 +10,9 @@ class Series(UUIDModel, DeletableModel):
 
     name = Column(String)
     show_id = Column(UUID(as_uuid=True), ForeignKey("show.id"), index=True)
-    show = relationship("Show", backref="series_arr", lazy="selectin", primaryjoin="Series.show_id == Show.id")
+    show = relationship(
+        "Show",
+        backref="series_arr",
+        lazy="selectin",
+        primaryjoin="Series.show_id == Show.id"
+    )
