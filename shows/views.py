@@ -111,8 +111,7 @@ async def update_show(show_id: uuid.UUID, show_param: ShowUpdate) -> ShowRespons
         absent_series = [series.id for series in show.series_arr if series.name not in series_param]
         await delete_entities_permanent(absent_series, Series)
 
-        actual_series = [series.name for series in show.series_arr]
-        series_to_create = [series_new for series_new in series_param if series_new not in actual_series]
+        series_to_create = [series_new for series_new in series_param if series_new not in show.series_names]
         await create_series_batch(show.id, series_to_create)
 
     show_param_data["last_build_date"] = datetime.datetime.utcnow().replace(tzinfo=None)
