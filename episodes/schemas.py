@@ -1,19 +1,19 @@
 import datetime
 import enum
 import uuid
+from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from schemas import UUIDSchema
+from schemas import UUIDSchema, DescribedSchema, TitledSchema
+from pydantic import BaseModel
 
 
 class EpisodeType(str, enum.Enum):
     full = "full"
 
 
-class EpisodeCreate(BaseModel):
-    title: str
-    description: str
+class EpisodeCreate(DescribedSchema, TitledSchema):
     episode_num: int
     season_num: int
     explicit: bool
@@ -22,8 +22,14 @@ class EpisodeCreate(BaseModel):
     series: str = Field(default=None, nullable=True)
 
 
-class EpisodeUpdate(EpisodeCreate):
-    pass
+class EpisodeUpdate(BaseModel):
+    title: Optional[str]
+    description: Optional[str]
+    episode_num: Optional[int]
+    season_num: Optional[int]
+    explicit: Optional[bool]
+    episode_type: Optional[EpisodeType]
+    series: Optional[str] = Field(default=None, nullable=True)
 
 
 class EpisodeBase(EpisodeCreate):

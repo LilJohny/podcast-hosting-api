@@ -1,9 +1,7 @@
-from pydantic import BaseModel
-
-from schemas import UUIDSchema
+from schemas import UUIDSchema, TitledSchema
 
 
-class ImageCreate(BaseModel):
+class ImageCreate(TitledSchema):
     title: str
 
 

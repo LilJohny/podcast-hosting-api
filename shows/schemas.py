@@ -3,7 +3,9 @@ import uuid
 from typing import Set, List, Optional
 
 from pydantic import BaseModel
-from schemas import UUIDSchema
+
+
+from schemas import UUIDSchema, DescribedSchema, TitledSchema
 
 
 class Language(str, enum.Enum):
@@ -14,9 +16,7 @@ class Category(str, enum.Enum):
     arts_books = "Arts/Books"
 
 
-class BaseShow(BaseModel):
-    title: str
-    description: str
+class BaseShow(DescribedSchema, TitledSchema):
     language: Language
     show_copyright: str
     category: Category
