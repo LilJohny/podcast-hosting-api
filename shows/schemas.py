@@ -2,8 +2,7 @@ import enum
 import uuid
 from typing import Set, List, Optional
 
-from pydantic import BaseModel
-
+from pydantic import BaseModel, Field
 
 from schemas import UUIDSchema, DescribedSchema, TitledSchema
 
@@ -37,8 +36,8 @@ class ShowUpdate(BaseModel):
 
 
 class ShowResponse(ShowCreate, UUIDSchema):
-    duration: int
-    episodes_number: int
+    duration: int = Field(default=0)
+    episodes_number: int = Field(default=0)
     series: Optional[List[str]]
     selected_streamings: List[str]
     image: uuid.UUID

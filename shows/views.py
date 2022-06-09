@@ -70,8 +70,6 @@ async def create_show(show_create_param: ShowCreate,
         **show.__dict__,
         series=series_param,
         selected_streamings=selected_streamings,
-        duration=show.duration,
-        episodes_number=show.episodes_number,
         cover_link=image.file_url
     )
 
