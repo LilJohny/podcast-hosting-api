@@ -49,11 +49,10 @@ async def get_entity(
         opts: Optional[list] = None,
 ) -> BaseModel:
     async with async_session_maker() as session:
-        async with session.begin():
-            base_select = prepare_base_select(entity, opts=opts)
-            result = await session.execute(
-                base_select.filter(entity.id == entity_id).filter(entity.is_removed == False))
-            item = result.first()
+        base_select = prepare_base_select(entity, opts=opts)
+        result = await session.execute(
+            base_select.filter(entity.id == entity_id).filter(entity.is_removed == False))
+        item = result.first()
     return item[0]
 
 
@@ -65,14 +64,13 @@ async def get_entities_paginated(
         order_by: Optional[Callable] = None
 ) -> Page:
     async with async_session_maker() as session:
-        async with session.begin():
-            base_select = prepare_base_select(entity, additional_group_by_columns, opts, order_by)
+        base_select = prepare_base_select(entity, additional_group_by_columns, opts, order_by)
 
-            query = base_select.filter(entity.is_removed == False)
-            if conditions:
-                for condition in conditions:
-                    query = query.where(condition)
-            result = await paginate(session, query)
+        query = base_select.filter(entity.is_removed == False)
+        if conditions:
+            for condition in conditions:
+                query = query.where(condition)
+        result = await paginate(session, query)
 
     return result
 
