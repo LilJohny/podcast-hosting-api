@@ -35,7 +35,7 @@ async def create_show(show_create_param: ShowCreate,
     image_dto = ImageDTO(title=image.title, url=image.file_url, height=100, width=100, link='')
     rss_feed = generate_new_show_rss_feed(show_create_param.title,
                                           '',
-                                          '',
+                                          image.file_url,
                                           show_create_param.description,
                                           GENERATOR_VERSION,
                                           show_create_param.language,
