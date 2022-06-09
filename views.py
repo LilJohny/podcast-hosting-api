@@ -25,7 +25,6 @@ async def delete_entity(entity_id: uuid.UUID, entity_class):
 async def update_entity(entity_id: uuid.UUID, entity_class, entity_param, serializer_class, entity_instance=None, opts: Optional[list] = None):
     if not entity_instance:
         entity_instance = await get_view_entity(entity_id, entity_class, opts)
-        print(entity_instance.__dict__)
     for key, val in entity_param.items():
         setattr(entity_instance, key, val)
     await save_entity(entity_instance)
