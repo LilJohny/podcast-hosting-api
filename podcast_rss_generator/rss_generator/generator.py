@@ -3,14 +3,14 @@ import datetime
 import functools
 from typing import Optional, Iterable
 
-from .constants import MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT
-from .elements import DEFAULT_ETREE, GUIDElement, EnclosureElement, ItemElement, ImageElement, ItunesImageElement, \
-    ItunesExplicitElement, ItunesAuthorElement, \
-    AtomLinkElement, ItunesSummaryElement, PodcastLockedElement, ItunesOwnerElement, ItunesTypeElement, LinkElement, \
-    ItunesCategoryElement
-from .helpers import datetime_to_str, cdata_wrap, to_xml_bool, to_xml_bool_word, p_tag_wrap
-from .types import GUIDDataDTO, PodcastOwnerDTO, ImageDTO
-from ..enums import ITunesXML, EpisodeType, PodcastType
+from podcast_rss_generator.rss_generator.constants import MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT
+from podcast_rss_generator.rss_generator.elements import DEFAULT_ETREE, GUIDElement, EnclosureElement, ItemElement, \
+    ImageElement, ItunesImageElement, ItunesExplicitElement, ItunesAuthorElement, AtomLinkElement, ItunesSummaryElement, \
+    PodcastLockedElement, ItunesOwnerElement, ItunesTypeElement, LinkElement, ItunesCategoryElement
+from podcast_rss_generator.rss_generator.helpers import datetime_to_str, cdata_wrap, to_xml_bool, to_xml_bool_word, \
+    p_tag_wrap
+from podcast_rss_generator.rss_generator.types import GUIDDataDTO, PodcastOwnerDTO, ImageDTO
+from podcast_rss_generator.enums import ITunesXML, EpisodeType, PodcastType
 
 
 def add_subelement_with_text(

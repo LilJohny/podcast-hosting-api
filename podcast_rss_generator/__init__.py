@@ -1,11 +1,11 @@
 import datetime
 
-from .enums import PodcastType, EpisodeType
-from .rss_generator import generate_rss, gen_image, PODCAST_ATTRS, XML_LANG, gen_itunes_image, gen_itunes_explicit, \
+from podcast_rss_generator.enums import PodcastType, EpisodeType
+from podcast_rss_generator.rss_generator import generate_rss, gen_image, PODCAST_ATTRS, XML_LANG, gen_itunes_image, gen_itunes_explicit, \
     gen_itunes_author, gen_atom_link, gen_itunes_summary, gen_podcast_locked, gen_itunes_type, gen_itunes_owner, \
     gen_episode
-from .rss_generator.helpers import el_to_str, cdata_wrap, datetime_to_str
-from .rss_generator.types import ImageDTO, PodcastOwnerDTO, GUIDDataDTO
+from podcast_rss_generator.rss_generator.helpers import el_to_str, cdata_wrap, datetime_to_str
+from podcast_rss_generator.rss_generator.types import ImageDTO, PodcastOwnerDTO, GUIDDataDTO
 
 RSS_FILENAME = "current.xml"
 
