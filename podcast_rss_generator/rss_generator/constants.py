@@ -7,3 +7,5 @@ PODCAST_ATTRS = {
     "xmlns:atom": "http://www.w3.org/2005/Atom",
 }
 XML_LANG = "xml:lang"
+xslt_style_element = '<?xml-stylesheet type="text/xsl" href="https://media.rss.com/style.xsl"?>'
+UTF_8 = "utf-8"
