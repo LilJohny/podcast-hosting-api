@@ -33,18 +33,20 @@ async def create_show(show_create_param: ShowCreate,
     show_id = str_uuid_factory()
     show_link = "/".join([show_id, show_create_param.title])
     image_dto = ImageDTO(title=image.title, url=image.file_url, height=100, width=100, link='')
-    rss_feed = generate_new_show_rss_feed(show_create_param.title,
-                                          '',
-                                          image.file_url,
-                                          show_create_param.description,
-                                          GENERATOR_VERSION,
-                                          show_create_param.language,
-                                          show_create_param.show_copyright,
-                                          datetime.datetime.utcnow().replace(
-                                              tzinfo=None
-                                          ),
-                                          image_dto,
-                                          PodcastOwnerDTO(name=user.email, email=user.email))
+    rss_feed = generate_new_show_rss_feed(
+        show_create_param.title,
+        '',
+        image.file_url,
+        show_create_param.description,
+        GENERATOR_VERSION,
+        show_create_param.language,
+        show_create_param.show_copyright,
+        datetime.datetime.utcnow().replace(
+            tzinfo=None
+        ),
+        image_dto,
+        PodcastOwnerDTO(name=user.email, email=user.email)
+    )
     feed_file_link = await upload_file_to_s3(f"{show_id.replace('-', '')}.xml", rss_feed.decode('utf-8'), FileKind.XML)
 
     show_create_param_data = show_create_param.dict()
