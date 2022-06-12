@@ -10,6 +10,7 @@ from utils.files import fetch_file
 rss_router = APIRouter(prefix="/rss")
 
 
+@rss_router.head("/{show_id}/feed.xml")
 @rss_router.get("/{show_id}/feed.xml")
 async def rss_server(show_id: uuid.UUID):
     show = await get_entity(show_id, Show)
