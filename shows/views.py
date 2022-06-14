@@ -168,7 +168,8 @@ async def list_shows(conditions):
         opts=[
             selectinload(Show.series_arr),
             selectinload(Show.episodes)
-        ]
+        ],
+        order_by=Show.last_build_date
     )
 
     shows = [
