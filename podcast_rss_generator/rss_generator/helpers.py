@@ -3,11 +3,12 @@ import xml
 
 import pytz
 
-from podcast_rss_generator.rss_generator.constants import xslt_style_element, UTF_8
+from podcast_rss_generator.rss_generator.constants import XSLT_STYLE_ELEMENT, UTF_8, UNICODE, DATETIME_GMT_FORMAT, \
+    XML_TAG_END, XML_TRUE, XML_FALSE, XML_YES, XML_NO, NEWLINE
 
 
 def cdata_wrap(text: str) -> str:
-    return fr"<![CDATA[{text}]]>"
+    return f"<![CDATA[{text}]]>"
 
 
 def p_tag_wrap(text: str) -> str:
@@ -15,23 +16,27 @@ def p_tag_wrap(text: str) -> str:
 
 
 def datetime_to_str(date: datetime.datetime) -> str:
-    return date.astimezone(tz=pytz.UTC).strftime("%a, %d %b %Y %H:%M:%S GMT")
+    return date.astimezone(tz=pytz.UTC).strftime(DATETIME_GMT_FORMAT)
 
 
-def el_to_str(rss_xml_element, add_xml_header=False):
+def el_to_str(rss_xml_element, add_xml_header=False) -> bytes:
     if add_xml_header:
-        el_str = xml.etree.ElementTree.tostring(rss_xml_element, encoding=UTF_8)
-        el_lines = el_str.decode(UTF_8).split("\n")
-        el_lines.insert(1, xslt_style_element)
-        el_str = "\n".join(el_lines).encode(UTF_8)
+        el_lines = xml.etree.ElementTree.tostring(
+            rss_xml_element,
+            encoding=UNICODE,
+            xml_declaration=True
+        ).split(XML_TAG_END)
+        el_lines[0] += XML_TAG_END
+        el_lines.insert(1, XSLT_STYLE_ELEMENT)
+        el_str = NEWLINE.join(el_lines).encode(UTF_8)
     else:
         el_str = xml.etree.ElementTree.tostring(rss_xml_element)
     return el_str
 
 
 def to_xml_bool(val: bool) -> str:
-    return "true" if val else "false"
+    return XML_TRUE if val else XML_FALSE
 
 
 def to_xml_bool_word(val: bool) -> str:
-    return "yes" if val else "no"
+    return XML_YES if val else XML_NO

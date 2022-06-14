@@ -7,5 +7,13 @@ PODCAST_ATTRS = {
     "xmlns:atom": "http://www.w3.org/2005/Atom",
 }
 XML_LANG = "xml:lang"
-xslt_style_element = '<?xml-stylesheet type="text/xsl" href="https://media.rss.com/style.xsl"?>'
+XSLT_STYLE_ELEMENT = '<?xml-stylesheet type="text/xsl" href="https://media.rss.com/style.xsl"?>'
 UTF_8 = "utf-8"
+UNICODE = "unicode"
+DATETIME_GMT_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
+XML_TAG_END = "?>"
+XML_TRUE = "true"
+XML_FALSE = "false"
+XML_YES = "yes"
+XML_NO = "no"
+NEWLINE = "\n"
