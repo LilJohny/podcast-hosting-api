@@ -1,5 +1,5 @@
-MAX_IMAGE_WIDTH = 144
-MAX_IMAGE_HEIGHT = 400
+MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT = 3000, 3000
+MIN_IMAGE_WIDTH, MIN_IMAGE_HEIGHT = 1400, 1400
 PODCAST_ATTRS = {
     "xmlns:podcast": "https://podcastindex.org/namespace/1.0",
     "xmlns:itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd",

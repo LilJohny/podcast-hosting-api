@@ -3,7 +3,8 @@ import datetime
 import functools
 from typing import Optional, Iterable
 
-from podcast_rss_generator.rss_generator.constants import MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT
+from podcast_rss_generator.rss_generator.constants import MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, MIN_IMAGE_WIDTH, \
+    MIN_IMAGE_HEIGHT
 from podcast_rss_generator.rss_generator.elements import DEFAULT_ETREE, GUIDElement, EnclosureElement, ItemElement, \
     ImageElement, ItunesImageElement, ItunesExplicitElement, ItunesAuthorElement, AtomLinkElement, ItunesSummaryElement, \
     PodcastLockedElement, ItunesOwnerElement, ItunesTypeElement, LinkElement, ItunesCategoryElement
@@ -103,13 +104,17 @@ def gen_image(
 
     if width is not None:
         if width > MAX_IMAGE_WIDTH:
-            raise ValueError(f"Max width is {MAX_IMAGE_WIDTH}")
+            raise ValueError(f"Maximum width is {MAX_IMAGE_WIDTH}")
+        elif width < MIN_IMAGE_WIDTH:
+            raise ValueError(f"Minimun width is {MIN_IMAGE_WIDTH}")
 
         add_subelement_with_text_etree(image, "width", str(width))
 
     if height is not None:
-        if width > MAX_IMAGE_HEIGHT:
-            raise ValueError(f"Max height is {MAX_IMAGE_HEIGHT}")
+        if height > MAX_IMAGE_HEIGHT:
+            raise ValueError(f"Maximum height is {MAX_IMAGE_HEIGHT}")
+        elif height > MIN_IMAGE_HEIGHT:
+            raise ValueError(f"Minimum height is {MIN_IMAGE_HEIGHT}")
 
         add_subelement_with_text_etree(image, "height", str(height))
 
