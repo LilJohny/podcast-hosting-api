@@ -4,14 +4,16 @@ from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File
 from fastapi_pagination import Page, create_page
+from sqlalchemy import func
 from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
 from images.views import create_image
 from schemas import str_uuid_factory
-from podcast_rss_generator import generate_new_show_rss_feed, PodcastOwnerDTO, ImageDTO
+from podcast_rss_generator import generate_show_rss_feed, PodcastOwnerDTO, ImageDTO
 from series.models import Series
 from series.views import create_series_batch
+from settings import BASE_URL
 from shows.models import Show
 from shows.schemas import ShowUpdate, ShowResponse, ShowCreate
 from users import User, current_active_user
