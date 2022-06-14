@@ -152,12 +152,13 @@ def generate_rss(
         podcast_link: str,
         media_link: str,
         description: str,
-        language: Optional[str],
-        copyright: Optional[str],
-        lastBuildDate: Optional[str],
-        category: Optional[str],
-        generator: Optional[str],
-        image: Optional[ImageDTO],
+        self_link: str,
+        language: str,
+        copyright: str,
+        lastBuildDate: str,
+        category: str,
+        generator: str,
+        image: ImageDTO,
         podcast_owner: PodcastOwnerDTO,
         podcast_type: PodcastType = PodcastType.EPISODIC,
         is_explicit=False,
@@ -182,7 +183,11 @@ def generate_rss(
     itunes_owner = gen_itunes_owner(podcast_owner.name, podcast_owner.email)
     explicit = gen_itunes_explicit(is_explicit)
     itunes_type = gen_itunes_type(podcast_type.value)
-    self_atom_link = gen_atom_link(href=f"{media_link}/feed.xml", rel="self", type_="application/rss+xml")
+    self_atom_link = gen_atom_link(
+        href=self_link,
+        rel="self",
+        type_="application/rss+xml"
+    )
     itunes_category = gen_itunes_category("Arts", "Books")
     image_el = gen_image(**dataclasses.asdict(image))
 
@@ -216,7 +221,7 @@ def generate_rss(
 
     keys_to_pop = ["etree", "items", "title", "link", "description", "image", "podcast_link", "media_link",
                    "podcast_owner", "podcast_type", "is_explicit", "is_locked", "language", "copyright",
-                   "lastBuildDate", "category", "generator"]
+                   "lastBuildDate", "category", "generator", "self_link"]
     for pop_key in keys_to_pop:
         args.pop(pop_key, None)
 

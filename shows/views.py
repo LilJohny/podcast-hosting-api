@@ -35,6 +35,7 @@ async def create_show(show_create_param: ShowCreate,
     image_dto = ImageDTO(title=image.title, url=image.file_url, height=100, width=100, link='')
     rss_feed = generate_new_show_rss_feed(
         show_create_param.title,
+        f"{BASE_URL}/rss/{show_id}/feed.xml",
         '',
         image.file_url,
         show_create_param.description,
@@ -45,7 +46,7 @@ async def create_show(show_create_param: ShowCreate,
             tzinfo=None
         ),
         image_dto,
-        PodcastOwnerDTO(name=user.email, email=user.email)
+        PodcastOwnerDTO(name=f"{user.first_name} {user.last_name}", email=user.email)
     )
     feed_file_link = await upload_file_to_s3(f"{show_id.replace('-', '')}.xml", rss_feed.decode('utf-8'), FileKind.XML)
 

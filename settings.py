@@ -14,6 +14,7 @@ BUCKET_NAME = os.getenv("BUCKETEER_BUCKET_NAME")
 AWS_ACCESS_KEY_ID = os.getenv("BUCKETEER_AWS_ACCESS_KEY_ID")
 SECRET_ACCESS_KEY = os.getenv("BUCKETEER_AWS_SECRET_ACCESS_KEY")
 REGION = os.getenv("BUCKETEER_AWS_REGION")
+BASE_URL = os.getenv("BASE_URL")
 aws_session = aioboto3.Session(
     aws_access_key_id=AWS_ACCESS_KEY_ID,
     aws_secret_access_key=SECRET_ACCESS_KEY,
