@@ -32,7 +32,9 @@ async def create_show(#show_create_param: ShowCreate,
                       # image_file: UploadFile = File(...),
                       request: Request,
                       user: User = Depends(current_active_user)) -> ShowResponse:
-    print(await request.json())
+    req = await request.json()
+    print(type(req["form_data"]))
+    print(type(req["form_data"]["image_file"]))
     raise Exception()
     # image = await create_image(image_title, image_file)
     image = await get_entity("42912779-2047-4e72-96ae-b1fa3df0e3e3", Image)
