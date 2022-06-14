@@ -2,7 +2,7 @@ import datetime
 import uuid
 from typing import Optional
 
-from fastapi import status, APIRouter, Depends, UploadFile, File
+from fastapi import status, APIRouter, Depends, UploadFile, File, Request
 from fastapi_pagination import Page, create_page
 from sqlalchemy import func
 from sqlalchemy.orm import selectinload
@@ -27,11 +27,15 @@ shows_router = APIRouter(prefix="/shows")
 
 
 @shows_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_show(show_create_param: ShowCreate,
-                      image_title: str,
-                      image_file: UploadFile = File(...),
+async def create_show(#show_create_param: ShowCreate,
+                      #image_title: str,
+                      # image_file: UploadFile = File(...),
+                      request: Request,
                       user: User = Depends(current_active_user)) -> ShowResponse:
-    image = await create_image(image_title, image_file)
+    print(request)
+    raise Exception()
+    # image = await create_image(image_title, image_file)
+    image = await get_entity("42912779-2047-4e72-96ae-b1fa3df0e3e3", Image)
     show_id = str_uuid_factory()
     show_link = "/".join([show_id, show_create_param.title])
     image_dto = ImageDTO(title=image.title, url=image.file_url, height=1400, width=1400, link='')
