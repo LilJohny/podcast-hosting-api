@@ -28,7 +28,7 @@ shows_router = APIRouter(prefix="/shows")
 @shows_router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_show(show_create_param: ShowCreate,
                       user: User = Depends(current_active_user)) -> ShowResponse:
-    image = await get_entity(show_create_param.image_id, Image)
+    image = await get_entity(show_create_param.image, Image)
     show_id = str_uuid_factory()
     show_link = "/".join([show_id, show_create_param.title])
     image_dto = ImageDTO(title=image.title, url=image.file_url, height=1400, width=1400, link='')
