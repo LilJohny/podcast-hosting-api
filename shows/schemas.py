@@ -19,12 +19,12 @@ class BaseShow(DescribedSchema, TitledSchema):
     language: Language
     show_copyright: str
     category: Category
+    series: Set[str]
+    selected_streamings: List[str]
 
 
 class ShowCreate(BaseShow):
     image_id: uuid.UUID
-    series: Set[str]
-    selected_streamings: List[str]
 
 
 class ShowUpdate(BaseModel):
@@ -36,7 +36,7 @@ class ShowUpdate(BaseModel):
     series: Optional[Set[str]]
 
 
-class ShowResponse(ShowCreate, UUIDSchema):
+class ShowResponse(BaseShow, UUIDSchema):
     duration: int = Field(default=0)
     episodes_number: int = Field(default=0)
     series: Optional[List[str]]
