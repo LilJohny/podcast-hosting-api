@@ -4,11 +4,10 @@ from typing import Optional
 
 from fastapi import status, APIRouter, Depends, UploadFile, File, Request
 from fastapi_pagination import Page, create_page
-from sqlalchemy import func
 from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
-from images.views import create_image
+from images.models import Image
 from schemas import str_uuid_factory
 from podcast_rss_generator import generate_show_rss_feed, PodcastOwnerDTO, ImageDTO
 from series.models import Series
@@ -27,17 +26,9 @@ shows_router = APIRouter(prefix="/shows")
 
 
 @shows_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_show(#show_create_param: ShowCreate,
-                      #image_title: str,
-                      # image_file: UploadFile = File(...),
-                      request: Request,
+async def create_show(show_create_param: ShowCreate,
                       user: User = Depends(current_active_user)) -> ShowResponse:
-    req = await request.json()
-    print(type(req["form_data"]))
-    print(type(req["form_data"]["image_file"]))
-    raise Exception()
-    # image = await create_image(image_title, image_file)
-    image = await get_entity("42912779-2047-4e72-96ae-b1fa3df0e3e3", Image)
+    image = await get_entity(show_create_param.image_id, Image)
     show_id = str_uuid_factory()
     show_link = "/".join([show_id, show_create_param.title])
     image_dto = ImageDTO(title=image.title, url=image.file_url, height=1400, width=1400, link='')
