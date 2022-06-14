@@ -34,6 +34,7 @@ class ShowUpdate(BaseModel):
     show_copyright: Optional[str]
     category: Optional[Category]
     series: Optional[Set[str]]
+    image: Optional[uuid.UUID]
 
 
 class ShowResponse(BaseShow, UUIDSchema):
