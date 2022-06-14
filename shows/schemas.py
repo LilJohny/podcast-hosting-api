@@ -22,6 +22,7 @@ class BaseShow(DescribedSchema, TitledSchema):
 
 
 class ShowCreate(BaseShow):
+    image_id: uuid.UUID
     series: Set[str]
     selected_streamings: List[str]
 
