@@ -32,8 +32,8 @@ async def create_show(show_create_param: ShowCreate,
     image = await create_image(image_title, image_file)
     show_id = str_uuid_factory()
     show_link = "/".join([show_id, show_create_param.title])
-    image_dto = ImageDTO(title=image.title, url=image.file_url, height=100, width=100, link='')
-    rss_feed = generate_new_show_rss_feed(
+    image_dto = ImageDTO(title=image.title, url=image.file_url, height=1400, width=1400, link='')
+    rss_feed = generate_show_rss_feed(
         show_create_param.title,
         f"{BASE_URL}/rss/{show_id}/feed.xml",
         '',
