@@ -53,10 +53,11 @@ async def create_show(show_create_param: ShowCreate,
 
     series_param = show_create_param_data.pop("series")
     selected_streamings = show_create_param_data.pop("selected_streamings")
+    image_id_param = show_create_param_data.pop("image_id")
     show = Show(
         **show_create_param_data,
         id=show_id,
-        image=image.id,
+        image=image_id_param,
         show_link=show_link,
         media_link=image.file_url,
         owner=user.id,
