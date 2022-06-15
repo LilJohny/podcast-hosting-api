@@ -34,7 +34,7 @@ async def delete_image(image_id: UUID):
     return await delete_entity_permanent(image_id, Image)
 
 
-@images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
+@images_router.get("/{image_id}", status_code=status.HTTP_200_OK, response_model=ImageResponse)
 async def read_image(image_id: UUID) -> ImageResponse:
     image = await read_entity(image_id, Image)
     return ImageResponse(**image.__dict__)
