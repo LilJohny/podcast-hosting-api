@@ -28,10 +28,14 @@ async def save_entity(entity: BaseModel):
 def prepare_base_select(
         entity: Type[BaseModel],
         additional_group_by_columns: Optional[list] = None,
+        only_columns: Optional[list] = None,
         opts: Optional[list] = None,
         order_by: Optional[Callable] = None
 ):
-    base_select = select(entity)
+    if not only_columns:
+        base_select = select(entity)
+    else:
+        base_select = select(*only_columns)
 
     if opts:
         for opt in opts:
@@ -46,10 +50,11 @@ def prepare_base_select(
 async def get_entity(
         entity_id: uuid.UUID,
         entity: Type[BaseModel],
+        only_columns: Optional[list] = None,
         opts: Optional[list] = None,
 ) -> BaseModel:
     async with async_session_maker() as session:
-        base_select = prepare_base_select(entity, opts=opts)
+        base_select = prepare_base_select(entity, opts=opts, only_columns=only_columns)
         result = await session.execute(
             base_select.filter(entity.id == entity_id).filter(entity.is_removed == False))
         item = result.first()
