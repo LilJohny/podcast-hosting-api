@@ -81,7 +81,7 @@ async def delete_entity_permanent(
 ):
     async with async_session_maker() as session:
         async with session.begin():
-            await session.execute(sqlalchemy.delete(entity).where(entity.id==entity_id))
+            await session.execute(sqlalchemy.delete(entity).where(entity.id == entity_id))
             await session.commit()
 
 
