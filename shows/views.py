@@ -1,5 +1,5 @@
 import datetime
-import uuid
+from uuid import UUID
 from typing import Optional
 
 from fastapi import status, APIRouter, Depends
@@ -93,7 +93,7 @@ async def list_my_shows(
 
 @shows_router.delete("/{show_id}")
 async def delete_show(
-        show_id: uuid.UUID,
+        show_id: UUID,
         user: User = Depends(current_active_user)
 ):
     return await delete_entity(show_id, Show)
@@ -101,7 +101,7 @@ async def delete_show(
 
 @shows_router.put("/{show_id}")
 async def update_show(
-        show_id: uuid.UUID,
+        show_id: UUID,
         show_param: ShowUpdate,
         user: User = Depends(current_active_user)
 ) -> ShowResponse:
@@ -128,7 +128,7 @@ async def update_show(
 
 @shows_router.get("/{show_id}")
 async def read_show(
-        show_id: uuid.UUID,
+        show_id: UUID,
         user: User = Depends(current_active_user)
 ) -> ShowResponse:
     show = await get_entity(

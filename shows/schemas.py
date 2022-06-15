@@ -1,5 +1,5 @@
 import enum
-import uuid
+from uuid import UUID
 from typing import Set, List, Optional
 
 from pydantic import BaseModel, Field
@@ -21,7 +21,7 @@ class BaseShow(DescribedSchema, TitledSchema):
     category: Category
     series: Set[str]
     selected_streamings: List[str]
-    image: uuid.UUID
+    image: UUID
 
 
 class ShowCreate(BaseShow):
@@ -35,7 +35,7 @@ class ShowUpdate(BaseModel):
     show_copyright: Optional[str]
     category: Optional[Category]
     series: Optional[Set[str]]
-    image: Optional[uuid.UUID]
+    image: Optional[UUID]
 
 
 class ShowResponse(BaseShow, UUIDSchema):

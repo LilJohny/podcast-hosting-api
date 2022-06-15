@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 
 from fastapi import status, APIRouter, UploadFile, File, Depends
 from fastapi_pagination import Page, create_page
@@ -27,7 +27,7 @@ async def create_image(
 
 
 @images_router.delete("/{image_id}", status_code=status.HTTP_202_ACCEPTED)
-async def delete_image(image_id: uuid.UUID):
+async def delete_image(image_id: UUID):
     image_url = await get_entity(image_id, Image, only_columns=[Image.file_url])
     image_s3_key = get_s3_key_from_link(image_url)
     await remove_file_from_s3(image_s3_key)
@@ -35,7 +35,7 @@ async def delete_image(image_id: uuid.UUID):
 
 
 @images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
-async def read_image(image_id: uuid.UUID) -> ImageResponse:
+async def read_image(image_id: UUID) -> ImageResponse:
     image = await read_entity(image_id, Image, ImageResponse)
     return image.__dict__
 

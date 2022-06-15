@@ -1,6 +1,6 @@
 import datetime
 import enum
-import uuid
+from uuid import UUID
 from typing import Optional
 
 from pydantic import Field
@@ -18,11 +18,11 @@ class EpisodeCreate(DescribedSchema, TitledSchema):
     season_num: int
     explicit: bool
     episode_type: EpisodeType
-    show_id: uuid.UUID = Field(default=None, foreign_key="show.id")
+    show_id: UUID = Field(default=None, foreign_key="show.id")
     series: str = Field(default=None, nullable=True)
     file_link: str
     duration: int
-    cover_image: uuid.UUID
+    cover_image: UUID
     cover_link: str
 
 

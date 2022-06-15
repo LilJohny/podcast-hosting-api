@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi.responses import Response
@@ -12,7 +12,7 @@ rss_router = APIRouter(prefix="/rss")
 
 @rss_router.head("/{show_id}/feed.xml")
 @rss_router.get("/{show_id}/feed.xml")
-async def rss_server(show_id: uuid.UUID):
+async def rss_server(show_id: UUID):
     show = await get_entity(show_id, Show)
     feed_file_content = await fetch_file(show.feed_file_link)
     return Response(feed_file_content.decode("utf-8"), media_type="application/xml")

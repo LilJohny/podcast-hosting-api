@@ -1,5 +1,5 @@
 import os
-import uuid
+from uuid import UUID
 from typing import Optional
 
 from fastapi import APIRouter, status, UploadFile, File, HTTPException, Depends
@@ -55,18 +55,18 @@ async def create_episode(episode_param: EpisodeCreate) -> EpisodeResponse:
 
 
 @episodes_router.delete("/{episode_id}", status_code=status.HTTP_202_ACCEPTED)
-async def delete_episode(episode_id: uuid.UUID):
+async def delete_episode(episode_id: UUID):
     return await delete_entity(episode_id, Episode)
 
 
 @episodes_router.put("/{episode_id}", status_code=status.HTTP_200_OK, response_model=EpisodeResponse)
-async def update_episode(episode_id: uuid.UUID, episode_param: EpisodeUpdate) -> EpisodeResponse:
+async def update_episode(episode_id: UUID, episode_param: EpisodeUpdate) -> EpisodeResponse:
     episode_param_data = {key: episode_param.dict()[key] for key in episode_param.dict() if episode_param.dict()[key]}
     return await update_entity(episode_id, Episode, episode_param_data, EpisodeResponse)
 
 
 @episodes_router.get("/{episode_id}", response_model=EpisodeResponse)
-async def read_episode(episode_id: uuid.UUID) -> EpisodeResponse:
+async def read_episode(episode_id: UUID) -> EpisodeResponse:
     episode = await get_entity(
         episode_id,
         Episode,
@@ -80,7 +80,7 @@ async def read_episode(episode_id: uuid.UUID) -> EpisodeResponse:
 
 @episodes_router.get("/", response_model=Page[EpisodeResponse])
 async def list_episode(
-        show_id: Optional[uuid.UUID] = None,
+        show_id: Optional[UUID] = None,
         series: Optional[str] = None,
         episode_title: Optional[str] = None
 ) -> Page[EpisodeResponse]:

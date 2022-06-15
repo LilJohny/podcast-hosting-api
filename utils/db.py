@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 from typing import Type, Optional, List, Callable
 
 import sqlalchemy
@@ -48,7 +48,7 @@ def prepare_base_select(
 
 
 async def get_entity(
-        entity_id: uuid.UUID,
+        entity_id: UUID,
         entity: Type[BaseModel],
         only_columns: Optional[list] = None,
         opts: Optional[list] = None,
@@ -81,7 +81,7 @@ async def get_entities_paginated(
 
 
 async def delete_entity_permanent(
-        entity_id: uuid.UUID,
+        entity_id: UUID,
         entity: Type[BaseModel]
 ):
     async with async_session_maker() as session:
@@ -91,7 +91,7 @@ async def delete_entity_permanent(
 
 
 async def delete_entities_permanent(
-        entity_ids: List[uuid.UUID],
+        entity_ids: List[UUID],
         entity: Type[BaseModel]
 ):
     async with async_session_maker() as session:

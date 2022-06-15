@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 from typing import Optional
 
 from fastapi import Depends, Request
@@ -13,7 +13,7 @@ from utils.mailing import prepare_email, send_email
 SECRET = USER_MANAGER_SECRET
 
 
-class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
+class UserManager(UUIDIDMixin, BaseUserManager[User, UUID]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
