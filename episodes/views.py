@@ -2,12 +2,13 @@ import os
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, status, UploadFile, File, HTTPException
+from fastapi import APIRouter, status, UploadFile, File, HTTPException, Depends
 from fastapi_pagination import Page, create_page
 from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
 from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate, EpisodeFileUploadResponse
+from users import User, current_active_user
 from utils.audio import DURATION_FINDERS
 from utils.db import save_entity, get_entities_paginated, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
@@ -17,8 +18,12 @@ episodes_router = APIRouter(prefix="/episodes")
 
 
 @episodes_router.post("/file/upload", status_code=status.HTTP_201_CREATED, response_model=EpisodeFileUploadResponse)
-async def upload_episode_file(episode_title: str, episode_file: UploadFile = File(...)) -> EpisodeFileUploadResponse:
-    episode_s3_key = get_s3_key(episode_file.filename, episode_title)
+async def upload_episode_file(
+        episode_title: str,
+        episode_file: UploadFile = File(...),
+        user: User = Depends(current_active_user)
+) -> EpisodeFileUploadResponse:
+    episode_s3_key = get_s3_key(episode_file.filename, episode_title, user.id)
     episode_link = await upload_file_to_s3(episode_s3_key, episode_file.file,
                                            FileKind.AUDIO)
     _, file_extension = os.path.splitext(episode_file.filename)
