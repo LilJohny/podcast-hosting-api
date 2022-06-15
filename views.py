@@ -5,7 +5,6 @@ from fastapi import HTTPException
 from starlette import status
 
 from utils.db import get_entity, save_entity
-from utils.serializers import serialize
 
 
 async def get_view_entity(entity_id: uuid.UUID, entity_class, opts: Optional[list] = None):
