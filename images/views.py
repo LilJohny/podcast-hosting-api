@@ -36,7 +36,7 @@ async def delete_image(image_id: UUID):
 
 @images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
 async def read_image(image_id: UUID) -> ImageResponse:
-    image = await read_entity(image_id, Image, ImageResponse)
+    image = await read_entity(image_id, Image)
     return image.__dict__
 
 
