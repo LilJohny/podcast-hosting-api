@@ -11,6 +11,7 @@ def determine_wave(audio_file):
 
 
 DURATION_FINDERS = {
-    "mp3": determine_mp3,
-    "wave": determine_wave
+    ".mp3": determine_mp3,
+    ".wave": determine_wave,
+    ".wav": determine_wave
 }
