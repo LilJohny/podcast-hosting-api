@@ -63,6 +63,11 @@ async def upload_file_to_s3(file_key: str,
         raise FileUploadFailedException(blob_s3_key)
 
 
+async def remove_file_from_s3(blob_s3_key: str):
+    async with aws_session.client("s3") as s3:
+        await s3.delete_object(Bucket=BUCKET_NAME, Key=blob_s3_key)
+
+
 async def fetch_file(url):
     async with httpx.AsyncClient() as client:
         resp = await client.get(url)
