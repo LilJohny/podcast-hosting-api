@@ -21,7 +21,7 @@ async def delete_entity(entity_id: UUID, entity_class):
     return status.HTTP_202_ACCEPTED
 
 
-async def update_entity(entity_id: UUID, entity_class, entity_param, serializer_class, entity_instance=None, opts: Optional[list] = None):
+async def update_entity(entity_id: UUID, entity_class, entity_param,  entity_instance=None, opts: Optional[list] = None):
     if not entity_instance:
         entity_instance = await get_view_entity(entity_id, entity_class, opts)
     for key, val in entity_param.items():

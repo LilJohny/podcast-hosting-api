@@ -116,7 +116,7 @@ async def update_show(
         series_to_create = [series_new for series_new in series_param if series_new not in show.series_names]
         await create_series_batch(show.id, series_to_create)
 
-    show = await update_entity(show_id, Show, show_param_data, ShowResponse, entity_instance=show)
+    show = await update_entity(show_id, Show, show_param_data, entity_instance=show)
     return ShowResponse(
         **show.__dict__,
         duration=show.duration,
