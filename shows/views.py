@@ -2,13 +2,11 @@ import datetime
 import uuid
 from typing import Optional
 
-from fastapi import status, APIRouter, Depends, UploadFile, File, Request
+from fastapi import status, APIRouter, Depends
 from fastapi_pagination import Page, create_page
 from sqlalchemy.orm import selectinload
 
-from episodes.models import Episode
 from images.models import Image
-from schemas import str_uuid_factory
 from podcast_rss_generator import generate_show_rss_feed, PodcastOwnerDTO, ImageDTO
 from series.models import Series
 from series.views import create_series_batch
@@ -16,6 +14,7 @@ from settings import BASE_URL
 from shows.models import Show
 from shows.schemas import ShowUpdate, ShowResponse, ShowCreate
 from users import User, current_active_user
+from utils.column_factories import str_uuid_factory
 from utils.constants import GENERATOR_VERSION
 from utils.db import save_entity, get_entities_paginated, get_entity, delete_entities_permanent
 from utils.files import upload_file_to_s3, FileKind
