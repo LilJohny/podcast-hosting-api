@@ -20,6 +20,10 @@ class EpisodeCreate(DescribedSchema, TitledSchema):
     episode_type: EpisodeType
     show_id: uuid.UUID = Field(default=None, foreign_key="show.id")
     series: str = Field(default=None, nullable=True)
+    file_link: str
+    duration: int
+    cover_image: uuid.UUID
+    cover_link: str
 
 
 class EpisodeUpdate(BaseModel):
@@ -33,12 +37,16 @@ class EpisodeUpdate(BaseModel):
 
 
 class EpisodeBase(EpisodeCreate):
-    file_link: str
     episode_link: str
     episode_guid: str
     pub_date: datetime.datetime
-    duration: int
 
 
 class EpisodeResponse(EpisodeBase, UUIDSchema):
-    cover_link: str
+    pass
+
+
+class EpisodeFileUploadResponse(BaseModel):
+    episode_link: str
+    file_extension: str
+    episode_duration: str
