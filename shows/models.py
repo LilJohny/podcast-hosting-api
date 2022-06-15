@@ -1,17 +1,12 @@
-import datetime
-
 from sqlalchemy import Column, String, DateTime, ForeignKey, BOOLEAN, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from models import UUIDModel, DeletableModel, DescribedModel
 from shows.schemas import Category, Language
+from utils.column_factories import datetime_now_no_tz
 from utils.constants import GENERATOR_VERSION
 from utils.streamings import from_streaming_options_db
-
-
-def datetime_now_no_tz():
-    return datetime.datetime.utcnow().replace(tzinfo=None)
 
 
 class Show(UUIDModel, DeletableModel, DescribedModel):
