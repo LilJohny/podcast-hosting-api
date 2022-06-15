@@ -1,13 +1,14 @@
 import uuid
 
-from fastapi import status, APIRouter, UploadFile, File
+from fastapi import status, APIRouter, UploadFile, File, Depends
 from fastapi_pagination import Page, create_page
 
 from images.models import Image
 from images.schemas import ImageResponse
-from utils.db import save_entity, get_entities_paginated
-from utils.files import upload_file_to_s3, FileKind, get_s3_key
-from views import delete_entity, read_entity
+from users import User, current_active_user
+from utils.db import save_entity, get_entities_paginated, delete_entity_permanent, get_entity
+from utils.files import upload_file_to_s3, FileKind, get_s3_key, get_s3_key_from_link, remove_file_from_s3
+from views import read_entity
 
 images_router = APIRouter(prefix="/images")
 
@@ -23,7 +24,10 @@ async def create_image(image_title: str, image_file: UploadFile = File(...)) -> 
 
 @images_router.delete("/{image_id}", status_code=status.HTTP_202_ACCEPTED)
 async def delete_image(image_id: uuid.UUID):
-    return await delete_entity(image_id, Image)
+    image_url = await get_entity(image_id, Image, only_columns=[Image.file_url])
+    image_s3_key = get_s3_key_from_link(image_url)
+    await remove_file_from_s3(image_s3_key)
+    return await delete_entity_permanent(image_id, Image)
 
 
 @images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
