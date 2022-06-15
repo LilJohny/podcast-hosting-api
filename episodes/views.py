@@ -1,4 +1,3 @@
-import datetime
 import os
 import uuid
 from typing import Optional
@@ -8,9 +7,7 @@ from fastapi_pagination import Page, create_page
 from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
-from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate
-from images.views import create_image
-from schemas import str_uuid_factory
+from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate, EpisodeFileUploadResponse
 from utils.audio import DURATION_FINDERS
 from utils.db import save_entity, get_entities_paginated, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
@@ -19,34 +16,36 @@ from views import delete_entity, update_entity
 episodes_router = APIRouter(prefix="/episodes")
 
 
-@episodes_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_episode(episode_param: EpisodeCreate,
-                         image_title: str,
-                         episode_file: UploadFile = File(...),
-                         image_file: UploadFile = File(...)) -> EpisodeResponse:
-    image = await create_image(image_title, image_file)
-    image_s3_key = get_s3_key(episode_file.filename, episode_param.title)
-    episode_link = await upload_file_to_s3(image_s3_key, episode_file.file,
+@episodes_router.post("/file/upload", status_code=status.HTTP_201_CREATED, response_model=EpisodeFileUploadResponse)
+async def upload_episode_file(episode_title: str, episode_file: UploadFile = File(...)) -> EpisodeFileUploadResponse:
+    episode_s3_key = get_s3_key(episode_file.filename, episode_title)
+    episode_link = await upload_file_to_s3(episode_s3_key, episode_file.file,
                                            FileKind.AUDIO)
-    episode_id = str_uuid_factory()
     _, file_extension = os.path.splitext(episode_file.filename)
     duration_finder = DURATION_FINDERS.get(file_extension)
     if duration_finder is None:
         raise HTTPException(status_code=400, detail="Amphora supports only .mp3 and .wave audio formats")
     episode_duration = duration_finder(episode_file.file)
-    episode = Episode(**episode_param.dict(),
-                      id=episode_id,
-                      file_link=episode_link,
-                      episode_link=f"/episode_id",
-                      cover_image=image.id,
-                      episode_guid=str_uuid_factory(),
-                      pub_date=datetime.datetime.utcnow().replace(tzinfo=None),
-                      duration=episode_duration
-                      )
+    return EpisodeFileUploadResponse(
+        episode_link=episode_link,
+        file_extension=file_extension,
+        episode_duration=episode_duration
+    )
+
+
+@episodes_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=EpisodeResponse)
+async def create_episode(episode_param: EpisodeCreate) -> EpisodeResponse:
+
+    episode_param_data = episode_param.dict()
+    cover_link_data = episode_param_data.pop("cover_link")
+    episode = Episode(
+        **episode_param_data,
+        episode_link=f"/episode_id",
+    )
     await save_entity(episode)
     return EpisodeResponse(
         **episode.__dict__,
-        cover_link=image.file_url
+        cover_link=cover_link_data
     )
 
 
