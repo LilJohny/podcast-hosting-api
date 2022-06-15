@@ -23,7 +23,7 @@ async def create_image(
     image_url = await upload_file_to_s3(image_s3_key, image_file.file, FileKind.IMAGE)
     image = Image(title=image_title, file_url=image_url)
     await save_entity(image)
-    return image.__dict__
+    return ImageResponse(**image.__dict__)
 
 
 @images_router.delete("/{image_id}", status_code=status.HTTP_202_ACCEPTED)
@@ -37,7 +37,7 @@ async def delete_image(image_id: UUID):
 @images_router.get("/{image_id}", status_code=status.HTTP_200_OK)
 async def read_image(image_id: UUID) -> ImageResponse:
     image = await read_entity(image_id, Image)
-    return image.__dict__
+    return ImageResponse(**image.__dict__)
 
 
 @images_router.get("/", response_model=Page[ImageResponse])
