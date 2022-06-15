@@ -1,5 +1,6 @@
 import enum
 import os
+from uuid import UUID
 from tempfile import SpooledTemporaryFile
 from typing import Union
 
@@ -19,10 +20,14 @@ class FileUploadFailedException(Exception):
         super().__init__(f"Failed to upload file {file_name}!")
 
 
-def get_s3_key(file_name: str, title: str) -> str:
+def get_s3_key(file_name: str, title: str, user_id: UUID) -> str:
     _, ext = os.path.splitext(file_name)
     s3_key = "".join([title, ext])
-    return s3_key
+    return "/".join([str(user_id), s3_key])
+
+
+def get_s3_key_from_link(file_link: str):
+    return f"/public{file_link.split('/public')[-1]}"
 
 
 async def upload_rss_to_s3(blob_s3_key: str, file_data: str):
