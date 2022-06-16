@@ -104,10 +104,16 @@ async def update_show(
         show_id: UUID,
         show_param: ShowUpdate,
         user: User = Depends(current_active_user)
-) -> ShowResponse:
+) -> int:
     show_param_data = {key: show_param.dict()[key] for key in show_param.dict() if show_param.dict()[key]}
+    selected_streamings_param, series_param, image_param = show_param_data.pop("selected_streamings", None), sorted(
+        show_param_data.pop("series", None)), show_param_data.get("image", None)
 
-    series_param = sorted(show_param_data.pop("series", None))
+    if selected_streamings_param:
+        show_param_data["streaming_options"] = to_streaming_options_db(selected_streamings_param)
+    if image_param:
+        show_param_data["media_link"] = await get_entity(image_param, Image, only_columns=[Image.file_url])
+
     show = await get_view_entity(show_id, Show, opts=[selectinload(Show.series_arr), selectinload(Show.episodes)])
     if series_param:
         absent_series = [series.id for series in show.series_arr if series.name not in series_param]
@@ -116,14 +122,9 @@ async def update_show(
         series_to_create = [series_new for series_new in series_param if series_new not in show.series_names]
         await create_series_batch(show.id, series_to_create)
 
-    show = await update_entity(show_id, Show, show_param_data, entity_instance=show)
-    return ShowResponse(
-        **show.__dict__,
-        duration=show.duration,
-        episodes_number=show.episodes_number,
-        series=show.series_names if not series_param else series_param,
-        selected_streamings=show.selected_streamings
-    )
+    await update_entity(show_id, Show, show_param_data, entity_instance=show)
+
+    return status.HTTP_202_ACCEPTED
 
 
 @shows_router.get("/{show_id}")

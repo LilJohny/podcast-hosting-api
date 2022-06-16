@@ -36,6 +36,7 @@ class ShowUpdate(BaseModel):
     category: Optional[Category]
     series: Optional[Set[str]]
     image: Optional[UUID]
+    selected_streamings: Optional[List[str]]
 
 
 class ShowResponse(BaseShow, UUIDSchema):
