@@ -50,8 +50,8 @@ def prepare_base_select(
 async def get_entity(
         entity_id: UUID,
         entity: Type[BaseModel],
-        only_columns: Optional[list] = None,
         opts: Optional[list] = None,
+        only_columns: Optional[list] = None
 ) -> BaseModel:
     async with async_session_maker() as session:
         base_select = prepare_base_select(entity, opts=opts, only_columns=only_columns)
