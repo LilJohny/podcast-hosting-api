@@ -28,9 +28,9 @@ async def save_entity(entity: BaseModel):
 def prepare_base_select(
         entity: Type[BaseModel],
         additional_group_by_columns: Optional[list] = None,
-        only_columns: Optional[list] = None,
         opts: Optional[list] = None,
-        order_by: Optional[Callable] = None
+        order_by: Optional[Callable] = None,
+        only_columns: Optional[list] = None
 ):
     if not only_columns:
         base_select = select(entity)
