@@ -59,14 +59,11 @@ async def delete_episode(episode_id: UUID):
     return await delete_entity(episode_id, Episode)
 
 
-@episodes_router.put("/{episode_id}", status_code=status.HTTP_200_OK, response_model=EpisodeResponse)
-async def update_episode(episode_id: UUID, episode_param: EpisodeUpdate) -> EpisodeResponse:
+@episodes_router.put("/{episode_id}", status_code=status.HTTP_202_ACCEPTED)
+async def update_episode(episode_id: UUID, episode_param: EpisodeUpdate) -> int:
     episode_param_data = {key: episode_param.dict()[key] for key in episode_param.dict() if episode_param.dict()[key]}
-    episode = await update_entity(episode_id, Episode, episode_param_data, opts=[selectinload(Episode.image_val)])
-    return EpisodeResponse(
-        **episode.__dict__,
-        cover_link=episode.image_val.file_url
-    )
+    await update_entity(episode_id, Episode, episode_param_data)
+    return status.HTTP_202_ACCEPTED
 
 
 @episodes_router.get("/{episode_id}", response_model=EpisodeResponse)

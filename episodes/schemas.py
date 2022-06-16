@@ -34,6 +34,7 @@ class EpisodeUpdate(BaseModel):
     explicit: Optional[bool]
     episode_type: Optional[EpisodeType]
     series: Optional[str] = Field(default=None, nullable=True)
+    cover_image: Optional[UUID]
 
 
 class EpisodeBase(EpisodeCreate):
