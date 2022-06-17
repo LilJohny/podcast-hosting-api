@@ -40,8 +40,9 @@ def prepare_base_select(
     if opts:
         for opt in opts:
             base_select = base_select.options(opt)
-    base_select = base_select.group_by(entity.id) if not additional_group_by_columns else base_select.group_by(
-        entity.id, *additional_group_by_columns)
+    base_select = base_select.group_by(entity.id) \
+        if not additional_group_by_columns \
+        else base_select.group_by(entity.id, *additional_group_by_columns)
     if not order_by:
         order_by = entity.id
     return base_select.order_by(order_by) if order_by else base_select.order_by(entity.id)
@@ -61,12 +62,13 @@ async def get_entity(
     return item[0]
 
 
-async def get_entities_paginated(
+async def get_entities(
         entity: Type[BaseModel],
         conditions: Optional[List[BinaryExpression]] = None,
         additional_group_by_columns: Optional[list] = None,
         opts: list = None,
-        order_by: Optional[Callable] = None
+        order_by: Optional[Callable] = None,
+        pagination: bool = False
 ) -> Page:
     async with async_session_maker() as session:
         base_select = prepare_base_select(entity, additional_group_by_columns, opts, order_by)
@@ -75,9 +77,14 @@ async def get_entities_paginated(
         if conditions:
             for condition in conditions:
                 query = query.where(condition)
-        result = await paginate(session, query)
 
-    return result
+        if pagination:
+            entities = await paginate(session, query)
+        else:
+            result = await session.execute(query)
+            entities = result.all()
+
+    return entities
 
 
 async def delete_entity_permanent(
