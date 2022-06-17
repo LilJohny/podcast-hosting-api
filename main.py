@@ -6,6 +6,7 @@ from sqladmin import Admin
 from episodes import episodes_router, EpisodeAdmin
 from images import images_router, ImageAdmin
 from series import SeriesAdmin
+from series.views import series_router
 from settings import ENGINE
 from shows import shows_router, ShowAdmin
 from users import User, UserRead, UserCreate, UserUpdate, UserAdmin, fastapi_users, current_active_user, auth_backend
@@ -57,6 +58,7 @@ app.include_router(
 app.include_router(shows_router, tags=["shows"])
 app.include_router(images_router, tags=["images"])
 app.include_router(episodes_router, tags=["episodes"])
+app.include_router(series_router, tags=["series"])
 app.include_router(rss_router)
 
 add_pagination(app)

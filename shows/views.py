@@ -16,7 +16,7 @@ from shows.schemas import ShowUpdate, ShowResponse, ShowCreate
 from users import User, current_active_user
 from utils.column_factories import str_uuid_factory
 from utils.constants import GENERATOR_VERSION
-from utils.db import save_entity, get_entities_paginated, get_entity, delete_entities_permanent
+from utils.db import save_entity, get_entities, get_entity, delete_entities_permanent
 from utils.files import upload_file_to_s3, FileKind
 from utils.streamings import to_streaming_options_db
 from views import delete_entity, update_entity, get_view_entity
@@ -160,14 +160,15 @@ async def list_all_shows(show_name: Optional[str] = None, featured: Optional[boo
 
 
 async def list_shows(conditions):
-    shows, total, params = await get_entities_paginated(
+    shows, total, params = await get_entities(
         Show,
         conditions,
         opts=[
             selectinload(Show.series_arr),
             selectinload(Show.episodes)
         ],
-        order_by=Show.last_build_date
+        order_by=Show.last_build_date,
+        pagination=True
     )
 
     shows = [

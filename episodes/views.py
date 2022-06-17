@@ -10,7 +10,7 @@ from episodes.models import Episode
 from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate, EpisodeFileUploadResponse
 from users import User, current_active_user
 from utils.audio import DURATION_FINDERS
-from utils.db import save_entity, get_entities_paginated, get_entity
+from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
 from views import delete_entity, update_entity
 
@@ -24,7 +24,8 @@ async def upload_episode_file(
         user: User = Depends(current_active_user)
 ) -> EpisodeFileUploadResponse:
     episode_s3_key = get_s3_key(episode_file.filename, episode_title, user.id)
-    episode_link = await upload_file_to_s3(episode_s3_key, episode_file.file,
+    episode_link = await upload_file_to_s3(episode_s3_key,
+                                           episode_file.file,
                                            FileKind.AUDIO)
     _, file_extension = os.path.splitext(episode_file.filename)
     duration_finder = DURATION_FINDERS.get(file_extension)
@@ -90,11 +91,12 @@ async def list_episode(
                                                                             ] if field_val is not None]
     if episode_title:
         conditions.append(Episode.title.ilike(f"%{episode_title}%"))
-    episodes, total, param = await get_entities_paginated(
+    episodes, total, param = await get_entities(
         Episode,
         conditions,
         opts=[selectinload(Episode.image_val)],
-        order_by=lambda: Episode.season_num * 10 + Episode.episode_num
+        order_by=lambda: Episode.season_num * 10 + Episode.episode_num,
+        pagination=True
     )
     episodes = [EpisodeResponse(
         **episode[0].__dict__,
