@@ -62,7 +62,8 @@ async def delete_episode(episode_id: UUID):
 
 @episodes_router.put("/{episode_id}", status_code=status.HTTP_202_ACCEPTED)
 async def update_episode(episode_id: UUID, episode_param: EpisodeUpdate) -> int:
-    episode_param_data = {key: episode_param.dict()[key] for key in episode_param.dict() if episode_param.dict()[key]}
+    episode_param_data = episode_param.dict()
+    episode_param_data = {key: episode_param_data[key] for key in episode_param_data if episode_param_data[key]}
     await update_entity(episode_id, Episode, episode_param_data)
     return status.HTTP_202_ACCEPTED
 

@@ -9,4 +9,9 @@ class Image(UUIDModel, DeletableModel):
 
     title = Column(String)
     file_url = Column(String)
-    episode = relationship("Episode", backref="image_val", lazy="selectin", primaryjoin="Image.id == Episode.cover_image")
+    episode = relationship(
+        "Episode",
+        backref="image_val",
+        lazy="selectin",
+        primaryjoin="Image.id == Episode.cover_image"
+    )

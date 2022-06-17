@@ -27,10 +27,12 @@ shows_router = APIRouter(prefix="/shows")
 @shows_router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_show(show_create_param: ShowCreate,
                       user: User = Depends(current_active_user)) -> ShowResponse:
-    image = await get_entity(show_create_param.image, Image)
     show_id = str_uuid_factory()
     show_link = "/".join([show_id, show_create_param.title])
+
+    image = await get_entity(show_create_param.image, Image)
     image_dto = ImageDTO(title=image.title, url=image.file_url, height=1400, width=1400, link='')
+
     rss_feed = generate_show_rss_feed(
         show_create_param.title,
         f"{BASE_URL}/rss/{show_id}/feed.xml",
@@ -50,8 +52,9 @@ async def create_show(show_create_param: ShowCreate,
 
     show_create_param_data = show_create_param.dict()
 
-    series_param = show_create_param_data.pop("series")
-    selected_streamings = show_create_param_data.pop("selected_streamings")
+    series_param, selected_streamings = show_create_param_data.pop("series"),\
+                                        show_create_param_data.pop("selected_streamings")
+
     show = Show(
         **show_create_param_data,
         id=show_id,
@@ -61,6 +64,7 @@ async def create_show(show_create_param: ShowCreate,
         feed_file_link=feed_file_link,
         streaming_options=to_streaming_options_db(selected_streamings)
     )
+
     await save_entity(show)
     await create_series_batch(show_id, series_param)
 
@@ -105,9 +109,12 @@ async def update_show(
         show_param: ShowUpdate,
         user: User = Depends(current_active_user)
 ) -> int:
-    show_param_data = {key: show_param.dict()[key] for key in show_param.dict() if show_param.dict()[key]}
-    selected_streamings_param, series_param, image_param = show_param_data.pop("selected_streamings", None), sorted(
-        show_param_data.pop("series", None)), show_param_data.get("image", None)
+    show_param_data = show_param.dict()
+    show_param_data = {key: show_param_data[key] for key in show_param_data if show_param_data[key]}
+
+    selected_streamings_param, series_param, image_param = show_param_data.pop("selected_streamings", None),\
+                                                           sorted(show_param_data.pop("series", None)),\
+                                                           show_param_data.get("image", None)
 
     if selected_streamings_param:
         show_param_data["streaming_options"] = to_streaming_options_db(selected_streamings_param)

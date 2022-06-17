@@ -68,10 +68,11 @@ async def get_entities(
         additional_group_by_columns: Optional[list] = None,
         opts: list = None,
         order_by: Optional[Callable] = None,
+        only_columns: Optional[list] = None,
         pagination: bool = False
 ) -> Page:
     async with async_session_maker() as session:
-        base_select = prepare_base_select(entity, additional_group_by_columns, opts, order_by)
+        base_select = prepare_base_select(entity, additional_group_by_columns, opts, order_by, only_columns)
 
         query = base_select.filter(entity.is_removed == False)
         if conditions:
