@@ -44,3 +44,4 @@ class ShowResponse(BaseShow, UUIDSchema):
     episodes_number: int = Field(default=0)
     series: Optional[List[str]]
     media_link: str
+    feed_file_link: str
