@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 from episodes.models import Episode
 from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate, EpisodeFileUploadResponse
 from users import User, current_active_user
-from utils.audio import DURATION_FINDERS
+from utils.audio import AUDIO_FILE_KINDS, get_duration
 from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
 from views import delete_entity, update_entity
@@ -28,10 +28,10 @@ async def upload_episode_file(
                                            episode_file.file,
                                            FileKind.AUDIO)
     _, file_extension = os.path.splitext(episode_file.filename)
-    duration_finder = DURATION_FINDERS.get(file_extension)
+    duration_finder = AUDIO_FILE_KINDS.get(file_extension)
     if duration_finder is None:
         raise HTTPException(status_code=400, detail="Amphora supports only .mp3 and .wave audio formats")
-    episode_duration = duration_finder(episode_file.file)
+    episode_duration = get_duration(episode_file.file, duration_finder)
     return EpisodeFileUploadResponse(
         episode_link=episode_link,
         file_extension=file_extension,
