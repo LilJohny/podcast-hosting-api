@@ -152,7 +152,8 @@ async def read_show(
         duration=show.duration,
         episodes_number=show.episodes_number,
         series=show.series_names,
-        selected_streamings=show.selected_streamings
+        selected_streamings=show.selected_streamings,
+        feed_link=f"{BASE_URL}/rss/{show_id}/feed.xml"
     )
 
 
