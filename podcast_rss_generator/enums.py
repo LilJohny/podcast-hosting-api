@@ -17,7 +17,7 @@ class ITunesXML(Enum):
     SUMMARY = "itunes:summary"
 
 
-class EpisodeType(Enum):
+class EpisodeType(str, Enum):
     FULL = "full"
     TRAILER = "trailer"
     BONUS = "bonus"
