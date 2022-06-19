@@ -8,8 +8,11 @@ from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
 from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate, EpisodeFileUploadResponse
+from podcast_rss_generator import gen_episode, GUIDDataDTO, EpisodeType
+from settings import BASE_URL
 from users import User, current_active_user
 from utils.audio import AUDIO_FILE_KINDS, get_duration
+from utils.column_factories import datetime_now_no_tz, str_uuid_factory
 from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
 from views import delete_entity, update_entity
@@ -44,9 +47,12 @@ async def create_episode(episode_param: EpisodeCreate, user: User = Depends(curr
 
     episode_param_data = episode_param.dict()
     cover_link_data = episode_param_data.pop("cover_link")
+    episode_id = str_uuid_factory()
+    new_episode_link = f"{BASE_URL}/podcasts/{episode_param.show_id}/{episode_id}"
     episode = Episode(
+        id=episode_id,
         **episode_param_data,
-        episode_link=f"/episode_id",
+        episode_link=new_episode_link,
     )
     await save_entity(episode)
     return EpisodeResponse(
