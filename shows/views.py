@@ -1,22 +1,19 @@
-import datetime
-from uuid import UUID
 from typing import Optional
+from uuid import UUID
 
 from fastapi import status, APIRouter, Depends
 from fastapi_pagination import Page, create_page
 from sqlalchemy.orm import selectinload
 
 from images.models import Image
-from podcast_rss_generator import generate_show_rss_feed, PodcastOwnerDTO, ImageDTO
+from podcast_rss_generator.generators import generate_new_show_feed
 from series.models import Series
 from series.views import create_series_batch
 from shows.models import Show
 from shows.schemas import ShowUpdate, ShowResponse, ShowCreate
 from users import User, current_active_user
 from utils.column_factories import str_uuid_factory
-from utils.constants import GENERATOR_VERSION
 from utils.db import save_entity, get_entities, get_entity, delete_entities_permanent
-from utils.files import upload_file_to_s3, FileKind
 from utils.links import get_feed_link, get_show_link
 from utils.streamings import to_streaming_options_db
 from views import delete_entity, update_entity, get_view_entity
@@ -25,34 +22,20 @@ shows_router = APIRouter(prefix="/shows")
 
 
 @shows_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=ShowResponse)
-async def create_show(show_create_param: ShowCreate,
-                      user: User = Depends(current_active_user)) -> ShowResponse:
+async def create_show(
+        show_create_param: ShowCreate,
+        user: User = Depends(current_active_user)
+) -> ShowResponse:
     show_id = str_uuid_factory()
     show_link, show_feed_link = get_show_link(show_id), get_feed_link(show_id)
 
     image = await get_entity(show_create_param.image, Image)
-    image_dto = ImageDTO(title=image.title, url=image.file_url, height=1400, width=1400, link='')
 
-    rss_feed = generate_show_rss_feed(
-        show_create_param.title,
-        show_feed_link,
-        show_link,
-        image.file_url,
-        show_create_param.description,
-        GENERATOR_VERSION,
-        show_create_param.language,
-        show_create_param.show_copyright,
-        datetime.datetime.utcnow().replace(
-            tzinfo=None
-        ),
-        image_dto,
-        PodcastOwnerDTO(name=f"{user.first_name} {user.last_name}", email=user.email)
-    )
-    rss_file_link = await upload_file_to_s3(f"{show_id.replace('-', '')}.xml", rss_feed.decode('utf-8'), FileKind.XML)
+    rss_file_link = await generate_new_show_feed(image, show_create_param, show_link, show_feed_link, show_id, user)
 
     show_create_param_data = show_create_param.dict()
 
-    series_param, selected_streamings = show_create_param_data.pop("series"),\
+    series_param, selected_streamings = show_create_param_data.pop("series"), \
                                         show_create_param_data.pop("selected_streamings")
 
     show = Show(
@@ -113,8 +96,8 @@ async def update_show(
     show_param_data = show_param.dict()
     show_param_data = {key: show_param_data[key] for key in show_param_data if show_param_data[key]}
 
-    selected_streamings_param, series_param, image_param = show_param_data.pop("selected_streamings", None),\
-                                                           sorted(show_param_data.pop("series", None)),\
+    selected_streamings_param, series_param, image_param = show_param_data.pop("selected_streamings", None), \
+                                                           sorted(show_param_data.pop("series", None)), \
                                                            show_param_data.get("image", None)
 
     if selected_streamings_param:
