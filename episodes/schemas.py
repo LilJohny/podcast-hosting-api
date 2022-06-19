@@ -1,5 +1,4 @@
 import datetime
-import enum
 from uuid import UUID
 from typing import Optional
 
@@ -8,7 +7,6 @@ from pydantic import Field
 from podcast_rss_generator import EpisodeType
 from schemas import UUIDSchema, DescribedSchema, TitledSchema
 from pydantic import BaseModel
-
 
 
 class EpisodeCreate(DescribedSchema, TitledSchema):
