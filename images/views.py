@@ -27,7 +27,7 @@ async def create_image(
 
 
 @images_router.delete("/{image_id}", status_code=status.HTTP_202_ACCEPTED)
-async def delete_image(image_id: UUID):
+async def delete_image(image_id: UUID, user: User = Depends(current_active_user)):
     image_url = await get_entity(image_id, Image, only_columns=[Image.file_url])
     image_s3_key = get_s3_key_from_link(image_url)
     await remove_file_from_s3(image_s3_key)

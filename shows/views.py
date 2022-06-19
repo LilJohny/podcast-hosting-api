@@ -158,7 +158,11 @@ async def read_show(
 
 
 @shows_router.get("/", response_model=Page[ShowResponse])
-async def list_all_shows(show_name: Optional[str] = None, featured: Optional[bool] = None):
+async def list_all_shows(
+        show_name: Optional[str] = None,
+        featured: Optional[bool] = None,
+        user: User = Depends(current_active_user)
+):
     conditions = []
     if featured:
         conditions.append(Show.featured == featured)

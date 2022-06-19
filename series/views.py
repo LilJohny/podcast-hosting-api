@@ -5,6 +5,7 @@ from fastapi import APIRouter
 
 from series.models import Series
 from utils.db import save_entities, get_entities
+from users import User, current_active_user
 
 series_router = APIRouter(prefix="/series")
 
@@ -16,7 +17,7 @@ async def create_series_batch(show_id: str, series_param: List[str]):
 
 
 @series_router.get("/{show_id}")
-async def get_series_by_show_id(show_id: UUID):
+async def get_series_by_show_id(show_id: UUID, user: User = Depends(current_active_user)):
     series = await get_entities(
         Series,
         conditions=[Series.show_id == show_id],

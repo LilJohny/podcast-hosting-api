@@ -40,7 +40,7 @@ async def upload_episode_file(
 
 
 @episodes_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=EpisodeResponse)
-async def create_episode(episode_param: EpisodeCreate) -> EpisodeResponse:
+async def create_episode(episode_param: EpisodeCreate, user: User = Depends(current_active_user)) -> EpisodeResponse:
 
     episode_param_data = episode_param.dict()
     cover_link_data = episode_param_data.pop("cover_link")
@@ -56,12 +56,16 @@ async def create_episode(episode_param: EpisodeCreate) -> EpisodeResponse:
 
 
 @episodes_router.delete("/{episode_id}", status_code=status.HTTP_202_ACCEPTED)
-async def delete_episode(episode_id: UUID):
+async def delete_episode(episode_id: UUID, user: User = Depends(current_active_user)):
     return await delete_entity(episode_id, Episode)
 
 
 @episodes_router.put("/{episode_id}", status_code=status.HTTP_202_ACCEPTED)
-async def update_episode(episode_id: UUID, episode_param: EpisodeUpdate) -> int:
+async def update_episode(
+        episode_id: UUID,
+        episode_param: EpisodeUpdate,
+        user: User = Depends(current_active_user)
+) -> int:
     episode_param_data = episode_param.dict()
     episode_param_data = {key: episode_param_data[key] for key in episode_param_data if episode_param_data[key]}
     await update_entity(episode_id, Episode, episode_param_data)
@@ -85,7 +89,8 @@ async def read_episode(episode_id: UUID) -> EpisodeResponse:
 async def list_episode(
         show_id: Optional[UUID] = None,
         series: Optional[str] = None,
-        episode_title: Optional[str] = None
+        episode_title: Optional[str] = None,
+        user: User = Depends(current_active_user)
 ) -> Page[EpisodeResponse]:
     conditions = [(model_field == field_val) for model_field, field_val in [(Episode.show_id, show_id),
                                                                             (Episode.series, series),
