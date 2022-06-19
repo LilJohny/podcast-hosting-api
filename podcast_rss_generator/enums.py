@@ -18,6 +18,6 @@ class ITunesXML(Enum):
 
 
 class EpisodeType(str, Enum):
-    FULL = "full"
-    TRAILER = "trailer"
-    BONUS = "bonus"
+    full = "full"
+    trailer = "trailer"
+    bonus = "bonus"
