@@ -5,12 +5,10 @@ from typing import Optional
 
 from pydantic import Field
 
+from podcast_rss_generator import EpisodeType
 from schemas import UUIDSchema, DescribedSchema, TitledSchema
 from pydantic import BaseModel
 
-
-class EpisodeType(str, enum.Enum):
-    full = "full"
 
 
 class EpisodeCreate(DescribedSchema, TitledSchema):
