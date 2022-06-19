@@ -24,7 +24,7 @@ from views import delete_entity, update_entity, get_view_entity
 shows_router = APIRouter(prefix="/shows")
 
 
-@shows_router.post("/create", status_code=status.HTTP_201_CREATED)
+@shows_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=ShowResponse)
 async def create_show(show_create_param: ShowCreate,
                       user: User = Depends(current_active_user)) -> ShowResponse:
     show_id = str_uuid_factory()
@@ -134,7 +134,7 @@ async def update_show(
     return status.HTTP_202_ACCEPTED
 
 
-@shows_router.get("/{show_id}")
+@shows_router.get("/{show_id}", response_model=ShowResponse)
 async def read_show(
         show_id: UUID,
         user: User = Depends(current_active_user)

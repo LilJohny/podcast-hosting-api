@@ -59,7 +59,7 @@ app.include_router(shows_router, tags=["shows"])
 app.include_router(images_router, tags=["images"])
 app.include_router(episodes_router, tags=["episodes"])
 app.include_router(series_router, tags=["series"])
-app.include_router(rss_router)
+app.include_router(rss_router, tags=["rss server"])
 
 add_pagination(app)
 
