@@ -10,7 +10,6 @@ from images.models import Image
 from podcast_rss_generator import generate_show_rss_feed, PodcastOwnerDTO, ImageDTO
 from series.models import Series
 from series.views import create_series_batch
-from settings import BASE_URL
 from shows.models import Show
 from shows.schemas import ShowUpdate, ShowResponse, ShowCreate
 from users import User, current_active_user
@@ -18,6 +17,7 @@ from utils.column_factories import str_uuid_factory
 from utils.constants import GENERATOR_VERSION
 from utils.db import save_entity, get_entities, get_entity, delete_entities_permanent
 from utils.files import upload_file_to_s3, FileKind
+from utils.links import get_feed_link, get_show_link
 from utils.streamings import to_streaming_options_db
 from views import delete_entity, update_entity, get_view_entity
 
@@ -28,15 +28,15 @@ shows_router = APIRouter(prefix="/shows")
 async def create_show(show_create_param: ShowCreate,
                       user: User = Depends(current_active_user)) -> ShowResponse:
     show_id = str_uuid_factory()
-    show_link = "/".join([show_id, show_create_param.title])
+    show_link, show_feed_link = get_show_link(show_id), get_feed_link(show_id)
 
     image = await get_entity(show_create_param.image, Image)
     image_dto = ImageDTO(title=image.title, url=image.file_url, height=1400, width=1400, link='')
 
     rss_feed = generate_show_rss_feed(
         show_create_param.title,
-        f"{BASE_URL}/rss/{show_id}/feed.xml",
-        '',
+        show_feed_link,
+        show_link,
         image.file_url,
         show_create_param.description,
         GENERATOR_VERSION,
@@ -48,7 +48,7 @@ async def create_show(show_create_param: ShowCreate,
         image_dto,
         PodcastOwnerDTO(name=f"{user.first_name} {user.last_name}", email=user.email)
     )
-    feed_file_link = await upload_file_to_s3(f"{show_id.replace('-', '')}.xml", rss_feed.decode('utf-8'), FileKind.XML)
+    rss_file_link = await upload_file_to_s3(f"{show_id.replace('-', '')}.xml", rss_feed.decode('utf-8'), FileKind.XML)
 
     show_create_param_data = show_create_param.dict()
 
@@ -61,7 +61,7 @@ async def create_show(show_create_param: ShowCreate,
         show_link=show_link,
         media_link=image.file_url,
         owner=user.id,
-        feed_file_link=feed_file_link,
+        feed_file_link=rss_file_link,
         streaming_options=to_streaming_options_db(selected_streamings)
     )
 
@@ -72,7 +72,8 @@ async def create_show(show_create_param: ShowCreate,
         **show.__dict__,
         series=series_param,
         selected_streamings=selected_streamings,
-        cover_link=image.file_url
+        cover_link=image.file_url,
+        feed_link=show_feed_link
     )
 
 
@@ -153,7 +154,7 @@ async def read_show(
         episodes_number=show.episodes_number,
         series=show.series_names,
         selected_streamings=show.selected_streamings,
-        feed_link=f"{BASE_URL}/rss/{show_id}/feed.xml"
+        feed_link=get_feed_link(show_id)
     )
 
 

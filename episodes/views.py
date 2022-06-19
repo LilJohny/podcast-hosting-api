@@ -8,13 +8,13 @@ from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
 from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate, EpisodeFileUploadResponse
-from podcast_rss_generator import gen_episode, GUIDDataDTO, EpisodeType
-from settings import BASE_URL
+from podcast_rss_generator import gen_episode, GUIDDataDTO
 from users import User, current_active_user
 from utils.audio import AUDIO_FILE_KINDS, get_duration
 from utils.column_factories import datetime_now_no_tz, str_uuid_factory
 from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
+from utils.links import get_episode_link
 from views import delete_entity, update_entity
 
 episodes_router = APIRouter(prefix="/episodes")
@@ -27,9 +27,11 @@ async def upload_episode_file(
         user: User = Depends(current_active_user)
 ) -> EpisodeFileUploadResponse:
     episode_s3_key = get_s3_key(episode_file.filename, episode_title, user.id)
-    episode_link = await upload_file_to_s3(episode_s3_key,
-                                           episode_file.file,
-                                           FileKind.AUDIO)
+    episode_link = await upload_file_to_s3(
+        episode_s3_key,
+        episode_file.file,
+        FileKind.AUDIO
+    )
     _, file_extension = os.path.splitext(episode_file.filename)
     duration_finder = AUDIO_FILE_KINDS.get(file_extension)
     if duration_finder is None:
@@ -44,11 +46,10 @@ async def upload_episode_file(
 
 @episodes_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=EpisodeResponse)
 async def create_episode(episode_param: EpisodeCreate, user: User = Depends(current_active_user)) -> EpisodeResponse:
-
     episode_param_data = episode_param.dict()
     cover_link_data = episode_param_data.pop("cover_link")
     episode_id = str_uuid_factory()
-    new_episode_link = f"{BASE_URL}/podcasts/{episode_param.show_id}/{episode_id}"
+    new_episode_link = get_episode_link(episode_param.show_id, episode_id)
     episode = Episode(
         id=episode_id,
         **episode_param_data,
