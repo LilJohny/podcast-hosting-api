@@ -17,3 +17,8 @@ XML_FALSE = "false"
 XML_YES = "yes"
 XML_NO = "no"
 NEWLINE = "\n"
+PODCAST_NAMESPACES = [
+    ("podcast", "https://podcastindex.org/namespace/1.0"),
+    ("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd"),
+    ("atom", "http://www.w3.org/2005/Atom")
+]

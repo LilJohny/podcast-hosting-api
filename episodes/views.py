@@ -1,6 +1,6 @@
 import os
-from uuid import UUID
 from typing import Optional
+from uuid import UUID
 
 from fastapi import APIRouter, status, UploadFile, File, HTTPException, Depends
 from fastapi_pagination import Page, create_page
@@ -8,10 +8,11 @@ from sqlalchemy.orm import selectinload
 
 from episodes.models import Episode
 from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate, EpisodeFileUploadResponse
-from podcast_rss_generator import gen_episode, GUIDDataDTO
+from podcast_rss_generator.generators import add_new_episode_to_feed
+from shows.models import Show
 from users import User, current_active_user
 from utils.audio import AUDIO_FILE_KINDS, get_duration
-from utils.column_factories import datetime_now_no_tz, str_uuid_factory
+from utils.column_factories import str_uuid_factory
 from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
 from utils.links import get_episode_link
@@ -56,6 +57,8 @@ async def create_episode(episode_param: EpisodeCreate, user: User = Depends(curr
         episode_link=new_episode_link,
     )
     await save_entity(episode)
+    show = await get_entity(episode.show_id, Show)
+    await add_new_episode_to_feed(show, episode, cover_link_data, user.id)
     return EpisodeResponse(
         **episode.__dict__,
         cover_link=cover_link_data
