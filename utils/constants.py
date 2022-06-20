@@ -13,7 +13,7 @@ verify_user_mail_template = {
     "method": "POST",
     "data": {
         "from": "Hermes <hermes@amphora.digital>",
-        "subject": "You forgot your Amphora password",
+        "subject": "Amphora account verification",
         "text": "Thank you for registering on amphora.digital platform. "
                 "You account is already now, but you need to verify it via token. "
     }
