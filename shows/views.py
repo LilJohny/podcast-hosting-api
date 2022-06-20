@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import status, APIRouter, Depends
 from fastapi_pagination import Page, create_page
+from sqlalchemy import desc
 from sqlalchemy.orm import selectinload
 
 from images.models import Image
@@ -163,7 +164,7 @@ async def list_shows(conditions):
             selectinload(Show.series_arr),
             selectinload(Show.episodes)
         ],
-        order_by=Show.last_build_date,
+        order_by=lambda: desc(Show.last_build_date),
         pagination=True
     )
 

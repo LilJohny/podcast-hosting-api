@@ -43,8 +43,6 @@ def prepare_base_select(
     base_select = base_select.group_by(entity.id) \
         if not additional_group_by_columns \
         else base_select.group_by(entity.id, *additional_group_by_columns)
-    if not order_by:
-        order_by = entity.id
     return base_select.order_by(order_by) if order_by else base_select.order_by(entity.id)
 
 
