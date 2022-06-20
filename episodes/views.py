@@ -21,7 +21,7 @@ from views import delete_entity, update_entity
 episodes_router = APIRouter(prefix="/episodes")
 
 
-@episodes_router.post("/file/recorded", status_code=status.HTTP_201_CREATED)
+@episodes_router.post("/file/recorded", status_code=status.HTTP_201_CREATED, response_model=EpisodeFileUploadResponse)
 async def process_recorded_file(
         episode_title: str,
         duration: int,

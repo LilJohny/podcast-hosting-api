@@ -7,6 +7,7 @@ from typing import Union
 import httpx
 
 from settings import aws_session, BUCKET_NAME, PUBLIC_URL
+from utils.column_factories import datetime_now_no_tz
 
 
 class FileKind(str, enum.Enum):
@@ -21,6 +22,7 @@ class FileUploadFailedException(Exception):
 
 
 def get_s3_key(file_name: str, title: str, user_id: UUID) -> str:
+    title = "".join([str(datetime_now_no_tz()), title])
     _, ext = os.path.splitext(file_name)
     s3_key = "".join([title, ext])
     return "/".join([str(user_id), s3_key])
