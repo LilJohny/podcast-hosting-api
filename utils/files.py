@@ -22,10 +22,10 @@ class FileUploadFailedException(Exception):
 
 
 def get_s3_key(file_name: str, title: str, user_id: UUID) -> str:
-    file_name, title = file_name.replace(" ", ""), title.replace(" ", "")
     title = "".join([str(datetime_now_no_tz()), title])
     _, ext = os.path.splitext(file_name)
     s3_key = "".join([title, ext])
+    s3_key = s3_key.replace(" ", "")
     return "/".join([str(user_id), s3_key])
 
 
