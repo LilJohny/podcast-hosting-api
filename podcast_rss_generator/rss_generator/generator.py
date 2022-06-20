@@ -253,15 +253,15 @@ def gen_episode(
     duration = str(duration)
     season_num = str(season_num)
     episode_num = str(episode_num)
-    episode_title_cdata = cdata_wrap(episode_title)
+
     item = etree.Element("item")
     add_subelement_with_text_etree = functools.partial(
         add_subelement_with_text, etree=etree
     )
-    args = [('title', episode_title_cdata),
-            ('itunes:title', episode_title_cdata),
+    args = [('title', episode_title),
+            ('itunes:title', episode_title),
             ('itunes:summary', description),
-            ('description', cdata_wrap(p_tag_wrap(description))),
+            ('description', description),
             ('link', episode_link),
             ('enclosure', gen_enclosure(file_link, 8153337, "audio/mpeg")),
             ('guid', gen_guid(episode_guid.url, episode_guid.isPermalink)),
