@@ -11,7 +11,7 @@ from episodes.schemas import EpisodeCreate, EpisodeResponse, EpisodeUpdate, Epis
 from podcast_rss_generator.generators import add_new_episode_to_feed
 from shows.models import Show
 from users import User, current_active_user
-from utils.audio import AUDIO_FILE_KINDS, get_duration
+from utils.audio import AUDIO_FILE_KINDS, get_duration, decode_webm_to_mp3
 from utils.column_factories import str_uuid_factory
 from utils.db import save_entity, get_entities, get_entity
 from utils.files import upload_file_to_s3, FileKind, get_s3_key
@@ -19,6 +19,26 @@ from utils.links import get_episode_link
 from views import delete_entity, update_entity
 
 episodes_router = APIRouter(prefix="/episodes")
+
+
+@episodes_router.post("/file/recorded", status_code=status.HTTP_201_CREATED)
+async def process_recorded_file(
+        episode_title: str,
+        duration: int,
+        episode_file: UploadFile = File(...),
+        user: User = Depends(current_active_user)
+):
+    episode_s3_key = get_s3_key(episode_file.filename, episode_title, user.id)
+    episode_link = await upload_file_to_s3(
+        episode_s3_key.replace(".webm", ".mp3"),
+        decode_webm_to_mp3(episode_file.file),
+        FileKind.AUDIO
+    )
+    return EpisodeFileUploadResponse(
+        episode_link=episode_link,
+        file_extension=".mp3",
+        episode_duration=duration
+    )
 
 
 @episodes_router.post("/file/upload", status_code=status.HTTP_201_CREATED, response_model=EpisodeFileUploadResponse)
