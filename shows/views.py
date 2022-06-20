@@ -98,7 +98,7 @@ async def update_show(
     show_param_data = {key: show_param_data[key] for key in show_param_data if show_param_data[key]}
 
     selected_streamings_param, series_param, image_param = show_param_data.pop("selected_streamings", None), \
-                                                           sorted(show_param_data.pop("series", None)), \
+                                                           show_param_data.pop("series", None), \
                                                            show_param_data.get("image", None)
 
     if selected_streamings_param:
@@ -108,6 +108,7 @@ async def update_show(
 
     show = await get_view_entity(show_id, Show, opts=[selectinload(Show.series_arr), selectinload(Show.episodes)])
     if series_param:
+        series_param = sorted(series_param)
         absent_series = [series.id for series in show.series_arr if series.name not in series_param]
         await delete_entities_permanent(absent_series, Series)
 
